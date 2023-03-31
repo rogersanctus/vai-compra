@@ -5,11 +5,11 @@ export const metadata = {
   description: 'Realize suas compras no melhor e-commerce do país! Só vai.'
 }
 
-export default function RootLayout({
-  children
-}: {
+interface RootLayoutProps {
   children: React.ReactNode
-}) {
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="pt-BR">
       <body>{children}</body>
