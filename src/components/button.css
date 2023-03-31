@@ -1,0 +1,79 @@
+.button {
+  @apply transition-colors;
+  @apply hover:shadow-lg;
+}
+
+.button.button-primary {
+  @apply bg-sky-600;
+  @apply text-white;
+
+  @apply hover:bg-sky-700;
+}
+
+.button.button-secondary {
+  @apply bg-amber-500;
+  @apply text-white;
+
+  @apply hover:bg-amber-500/90;
+}
+
+.button.button-success {
+  @apply bg-emerald-600;
+  @apply text-white;
+
+  @apply hover:bg-emerald-700;
+}
+
+.button.button-info {
+  @apply bg-cyan-500;
+  @apply text-white;
+
+  @apply hover:bg-cyan-600;
+}
+
+.button.button-warning {
+  @apply bg-yellow-500;
+  @apply text-white;
+
+  @apply hover:bg-yellow-600;
+}
+
+.button.button-error {
+  @apply bg-rose-500;
+  @apply text-white;
+
+  @apply hover:bg-rose-700;
+}
+
+.button.button-dark {
+  @apply bg-slate-700;
+  @apply text-white;
+
+  @apply hover:bg-slate-800;
+}
+
+.button.button-xs {
+  @apply px-2 py-1;
+  @apply text-xs;
+}
+
+.button.button-sm {
+  @apply px-2 py-1;
+  @apply text-sm;
+}
+
+.button.button-md {
+  @apply px-3 py-2;
+  @apply text-base;
+}
+
+.button.button-lg {
+  @apply px-4 py-3;
+  @apply text-lg;
+}
+
+.button.button-xl {
+  @apply px-5 py-4;
+  @apply text-xl;
+}
+
