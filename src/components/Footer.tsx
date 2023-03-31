@@ -1,6 +1,10 @@
 import { Button } from './Button'
 import { Input } from './Input'
 import './footer.css'
+import { Facebook } from './svgs/Facebook'
+import { Instagram } from './svgs/Instagram'
+import { Linkedin } from './svgs/Linkedin'
+import { Twitter } from './svgs/Twitter'
 
 export function Footer() {
   return (
@@ -41,10 +45,26 @@ export function Footer() {
               Categorias
             </span>
             <ul className="text-sky-300 font-semibold mt-4">
-              <li>Categoria A</li>
-              <li>Categoria K</li>
-              <li>Categoria X</li>
-              <li>Categoria E</li>
+              <li>
+                <a href="#" title="" className="hover:text-sky-100">
+                  Categoria A
+                </a>
+              </li>
+              <li>
+                <a href="#" title="" className="hover:text-sky-100">
+                  Categoria K
+                </a>
+              </li>
+              <li>
+                <a href="#" title="" className="hover:text-sky-100">
+                  Categoria X
+                </a>
+              </li>
+              <li>
+                <a href="#" title="" className="hover:text-sky-100">
+                  Categoria E
+                </a>
+              </li>
             </ul>
           </div>
           <div>
@@ -52,19 +72,97 @@ export function Footer() {
               Ajuda
             </span>
             <ul className="text-sky-300 font-semibold mt-4">
-              <li>Sobre</li>
-              <li>Institucional</li>
-              <li>Como navegar</li>
+              <li>
+                <a
+                  href="#"
+                  title=""
+                  className="hover:text-sky-100 transition-colors"
+                >
+                  Sobre
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  title=""
+                  className="hover:text-sky-100 transition-colors"
+                >
+                  Como navegar
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  title=""
+                  className="hover:text-sky-100 transition-colors"
+                >
+                  Políticas de Cookies
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  title=""
+                  className="hover:text-sky-100 transition-colors"
+                >
+                  Políticas de Privacidade
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.procon.df.gov.br/wp-content/uploads/2019/08/Codigo-do-consumidor-FINAL.pdf"
+                  title="PDF do Código de defesa do consumidor"
+                >
+                  Código de defesa do consumidor
+                </a>
+              </li>
             </ul>
           </div>
           <div>
             <span className="text-xl uppercase text-white font-bold drop-shadow">
               Mídias Sociais
             </span>
-            <ul className="text-sky-300 font-semibold mt-4">
-              <li>Instagram</li>
-              <li>Facebook</li>
-              <li>Twitter</li>
+            <ul className="text-sky-400 font-semibold mt-5 flex flex-col gap-3">
+              <li>
+                <a
+                  href="#"
+                  title="Nosso Instagram"
+                  className="flex gap-2 fill-current hover:text-sky-100 transition-colors"
+                >
+                  <Instagram className="w-6 h-6" />
+                  <span>Instagram</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  title="Nosso Facebook"
+                  className="flex gap-2 fill-current hover:text-sky-100 transition-colors"
+                >
+                  <Facebook className="w-6 h-6" />
+                  <span>Facebook</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  title="Acompanhe nossos Tweets"
+                  className="flex gap-2 fill-current hover:text-sky-100 transition-colors"
+                >
+                  <Twitter className="w-6 h-6" />
+                  <span>Twitter</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  title="Conheça nossa empresa"
+                  className="flex gap-2 fill-current hover:text-sky-100 transition-colors"
+                >
+                  <Linkedin className="w-6 h-6" />
+                  <span>Linkedin</span>
+                </a>
+              </li>
             </ul>
           </div>
         </div>
