@@ -12,7 +12,6 @@ function urlStartsWithSome(url: string, paths: string[]) {
 }
 
 function redirectIfNeeded(request: NextRequest, to: string) {
-  console.log('redirect if needed', request.nextUrl, to)
   // already in the to path
   if (request.nextUrl.pathname.startsWith(to)) {
     return
@@ -27,8 +26,6 @@ export async function middleware(request: NextRequest) {
   // There is a auth session, must validate the token
   if (authSession) {
     try {
-      console.log('Going to', request.nextUrl.pathname)
-
       if (!process.env.JWT_PUB_KEY) {
         throw new MissingEnvVariableError('JWT_PUB_KEY')
       }
