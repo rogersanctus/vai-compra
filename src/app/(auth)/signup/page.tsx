@@ -47,8 +47,10 @@ export default function Signup() {
         })
       })
 
-      const data = await response.json()
-      console.log(data)
+      if (!response.ok) {
+        const data = await response.json()
+        throw data
+      }
     } catch (error) {
       console.error(error)
     }
