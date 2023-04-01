@@ -19,6 +19,7 @@ function PrependHeader() {
         name="serch-product"
         placeholder="Produto ou descrição"
         className="flex-grow w-full"
+        isAccent
       />
       <Button className="ml-2" variant="secondary" size="md">
         Buscar
@@ -30,7 +31,7 @@ function PrependHeader() {
 function AppendHeader() {
   return (
     <a
-      href="#cart"
+      href="/cart"
       title="Carrinho"
       className="ml-10 flex flex-col items-center"
     >
