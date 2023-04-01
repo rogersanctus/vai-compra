@@ -20,42 +20,48 @@ function redirectIfNeeded(request: NextRequest, to: string) {
   return NextResponse.redirect(new URL(to, request.url))
 }
 
+async function middlewareForAuthSession(
+  request: NextRequest,
+  authSession: string
+) {
+  try {
+    if (!process.env.JWT_PUB_KEY) {
+      throw new MissingEnvVariableError('JWT_PUB_KEY')
+    }
+
+    if (!process.env.RSA_ALG) {
+      throw new MissingEnvVariableError('RSA_ALG')
+    }
+
+    const alg = process.env.RSA_ALG
+    const pubKey = await importSPKI(process.env.JWT_PUB_KEY, alg)
+
+    await jwtVerify(authSession, pubKey)
+
+    if (urlStartsWithSome(request.nextUrl.pathname, authPaths)) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+  } catch (error) {
+    let retError = 'The session token is invalid'
+
+    if (error instanceof MissingEnvVariableError) {
+      retError = error.message
+    }
+
+    console.error(retError)
+
+    if (!urlStartsWithSome(request.nextUrl.pathname, authPaths)) {
+      return redirectIfNeeded(request, '/login')
+    }
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const authSession = request.cookies.get('auth-session')
 
-  // There is a auth session, must validate the token
+  // There is an auth session, must validate the token
   if (authSession) {
-    try {
-      if (!process.env.JWT_PUB_KEY) {
-        throw new MissingEnvVariableError('JWT_PUB_KEY')
-      }
-
-      if (!process.env.RSA_ALG) {
-        throw new MissingEnvVariableError('RSA_ALG')
-      }
-
-      const alg = process.env.RSA_ALG
-      const pubKey = await importSPKI(process.env.JWT_PUB_KEY, alg)
-
-      await jwtVerify(authSession.value, pubKey)
-
-      if (urlStartsWithSome(request.nextUrl.pathname, authPaths)) {
-        return NextResponse.redirect(new URL('/', request.url))
-      }
-    } catch (error) {
-      let retError = 'The session token is invalid'
-
-      if (error instanceof MissingEnvVariableError) {
-        retError = error.message
-      }
-
-      console.error(retError)
-
-      if (!urlStartsWithSome(request.nextUrl.pathname, authPaths)) {
-        return redirectIfNeeded(request, '/login')
-      }
-    }
-    return
+    return middlewareForAuthSession(request, authSession.value)
   }
 
   // Will not redirect if the next url is an Auth route
