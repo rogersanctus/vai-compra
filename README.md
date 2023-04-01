@@ -15,10 +15,10 @@ npm i
 ### Database
 The database used in this project is PostgreSQL. To run a fresh cloned project you must setup the environment and run some preparation commands.
 
-Setup the environment by creating or editing a .env.local file. You can also set those variables into you system, if wantted.
+Setup the environment by creating or editing a .env file. You can also set those variables into you system, if wantted.
 
 ```
-# Into the .env.local file (must be in the root of the project)
+# Into the .env file (must be in the root of the project)
 DATABASE_URL="postgresql://db_user:db_password@localhost:5432/vai-compra?schema=public"
 ```
 
