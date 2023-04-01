@@ -19,15 +19,19 @@ export function AuthInteraction() {
     >
       <UserCircleIcon className="text-white w-8 h-8" />
       {isLoggedIn ? (
-        <span>{user}</span>
+        <div className="whitespace-nowrap text-purple-100 font-semibold text-xs">
+          <a href="/logout" title="Fazer logout (sair)">
+            Sair
+          </a>
+        </div>
       ) : (
         <div className="whitespace-nowrap text-purple-100 font-semibold text-xs">
-          <a href="#login" title="Fazer Login">
+          <a href="/login" title="Fazer Login" className="mr-1">
             Login
           </a>
           /
-          <a href="#logout" title="Fazer Logout">
-            Logout
+          <a href="/signup" title="Cadastrar" className="ml-1">
+            Cadastrar
           </a>
         </div>
       )}
