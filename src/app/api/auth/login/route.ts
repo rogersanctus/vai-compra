@@ -1,8 +1,8 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { ZodError, z } from 'zod'
 import { doLogin } from '../service'
 import { sessionOptions } from '@/lib/session'
-import { importPKCS8, SignJWT } from 'jose'
+import { importPKCS8, importSPKI, jwtVerify, SignJWT } from 'jose'
 import { MissingEnvVariableError } from '@/lib/MissingEnvVariableError'
 
 export async function POST(request: NextRequest) {
@@ -60,6 +60,39 @@ export async function POST(request: NextRequest) {
         }
       },
       { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const authSession = request.cookies.get('auth-session')
+
+    if (!authSession) {
+      throw new Error('Auth session is missing')
+    }
+
+    if (!process.env.JWT_PUB_KEY) {
+      throw new MissingEnvVariableError('JWT_PUB_KEY')
+    }
+
+    if (!process.env.RSA_ALG) {
+      throw new MissingEnvVariableError('RSA_ALG')
+    }
+
+    const pkey = await importSPKI(process.env.JWT_PUB_KEY, process.env.RSA_ALG)
+
+    await jwtVerify(authSession.value, pkey)
+
+    const res = new NextResponse(null, { status: 204 })
+    res.cookies.delete('auth-session')
+
+    return res
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      { error: 'user_not_authenticated' },
+      { status: 403 }
     )
   }
 }
