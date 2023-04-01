@@ -4,6 +4,10 @@ An e-commerce made with NextJS 13, Tailwindcss and a few other libraries. Made f
 ## Setting up
 This project will run as both backend and frontend server. To the backend get to work properly, you need to setup some environment variables. The instructions bellow are for a Development mode environment.
 
+You will need openssl installed and have its binaries path added to your PATH system environment variable.
+
+_Part of the instructions on this documentation applies only for Linux bash shell. If you are using Windows/Mac terminal, please use the corresponding versions of each command._
+
 ### Install dependencies
 You need NodeJS on version 18 LTS to run this project well. Not tested with other verions.
 The first step ever is to install the dependencies. Do that by running:
@@ -45,9 +49,13 @@ create a Private and a Public RSA key. Those will be used to sign and verify JWT
 # The application expects the keys to be priv.key and pub.key
 
 # private key
-openssl genrsa -out priv.key 2048
+openssl genrsa -out temp.key 2048
 # and public key (the priv key must be created first)
-openssl pkey -in priv.key -pubout -out pub.key
+openssl pkey -in temp.key -pubout -out pub.key
+# then, generate the pkcs8 key from the temp.key
+openssl pkcs8 -topk8 -nocrypt -in temp.key -out priv.key
+# and finally delete the temp.key
+rm temp.key
 ```
 
 Those commands will generate a pair of keys with the RS256 as algorithm. You must set this in your environment. You can set it with .env files. For example, create or edit a .env.local file with this content:
