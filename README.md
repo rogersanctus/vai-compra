@@ -1,38 +1,85 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Vai Compra
+An e-commerce made with NextJS 13, Tailwindcss and a few other libraries. Made from 'zero'.
 
-## Getting Started
+## Setting up
+This project will run as both backend and frontend server. To the backend get to work properly, you need to setup some environment variables. The instructions bellow are for a Development mode environment.
 
-First, run the development server:
+### Install dependencies
+You need NodeJS on version 18 LTS to run this project well. Not tested with other verions.
+The first step ever is to install the dependencies. Do that by running:
+
+```bash
+npm i
+```
+
+### Database
+The database used in this project is PostgreSQL. To run a fresh cloned project you must setup the environment and run some preparation commands.
+
+Setup the environment by creating or editing a .env.local file. You can also set those variables into you system, if wantted.
+
+```
+# Into the .env.local file (must be in the root of the project)
+DATABASE_URL="postgresql://db_user:db_password@localhost:5432/vai-compra?schema=public"
+```
+
+> Please replace `db_user` by your PostgreSQL user name and the `db_password` by your password. The default values on a fresh PostgreSQL tends to be: `db_user: 'postgres' and db_password: 'postgres'`.
+
+Now you can run the command:
+
+```bash
+npx prisma migrate dev
+```
+
+Your database may be now created and the migrations done.
+
+One last step is to generate the prisma client runtime. Run the command bellow.
+
+```bash
+npx prisma generate
+```
+
+### JWT Tokens
+create a Private and a Public RSA key. Those will be used to sign and verify JWT tokens for User authentication system. You can generate them with:
+
+```bash
+# The application expects the keys to be priv.key and pub.key
+
+# private key
+openssl genrsa -out priv.key 2048
+# and public key (the priv key must be created first)
+openssl pkey -in priv.key -pubout -out pub.key
+```
+
+Those commands will generate a pair of keys with the RS256 as algorithm. You must set this in your environment. You can set it with .env files. For example, create or edit a .env.local file with this content:
+
+```
+RSA_ALG=RS256
+```
+
+NextJS will automatically load .env files into the `Environment`.
+
+Yet for the Authentication system, you must setup a CRYPTO_SALT key. Its recommended to be a key with at least 32 bytes of size. Generate one with:
+
+```bash
+openssl rand -base64 32
+```
+
+Copy the result and paste it as a new entry in the .env.local file as:
+
+```
+CRYPTO_SALT=THE_RETURN_FROM_THE_COMMAND_ABOVE
+```
+
+> Please remmember to replace the text `THE_RETURN_FROM_THE_COMMAND_ABOVE` with the output from the openssl rand command.
+
+## Finally Running the application
+
+And to run run the server run:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+That command will serve both the API and the frontend for the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+If the command above runs well, open your Browser and navigate to: [http://localhost:3000](http://localhost:3000)
