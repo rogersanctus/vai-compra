@@ -9,3 +9,80 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  name           String
+  birthdate      DateTime
+  password_hash  String
+  newsletter     Newsletter[]
+  user_access    UserAccess[]
+  cart           Cart?
+  user_products  ProductUser[]
+  user_purchases UserPurchase[]
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @default(now())
+}
+
+model Newsletter {
+  id         Int      @id @default(autoincrement())
+  user       User?    @relation(fields: [user_id], references: [id])
+  email      String?  @unique
+  name       String?
+  user_id    Int?     @unique
+  signed     Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+model UserAccess {
+  id         Int      @id @default(autoincrement())
+  user_agent String
+  ip         String?
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    Int
+  created_at DateTime @default(now())
+}
+
+model Cart {
+  id         Int           @id @default(autoincrement())
+  user       User?         @relation(fields: [user_id], references: [id])
+  open       Boolean       @default(true)
+  user_id    Int?          @unique
+  products   CartProduct[]
+  created_at DateTime      @default(now())
+}
+
+model CartProduct {
+  id                  Int  @id @default(autoincrement())
+  product_external_id Int  @unique
+  amount              Int  @default(1)
+  cart                Cart @relation(fields: [cart_id], references: [id])
+  cart_id             Int
+}
+
+model ProductUser {
+  id                  Int     @id @default(autoincrement())
+  product_external_id Int
+  is_favorite         Boolean
+  user                User    @relation(fields: [user_id], references: [id])
+  user_id             Int
+}
+
+model UserPurchase {
+  id         Int                   @id @default(autoincrement())
+  user       User                  @relation(fields: [user_id], references: [id])
+  created_at DateTime              @default(now())
+  user_id    Int
+  products   UserPurchaseProduct[]
+}
+
+model UserPurchaseProduct {
+  id                  Int          @id @default(autoincrement())
+  user_purchase       UserPurchase @relation(fields: [user_purchase_id], references: [id])
+  product_external_id Int
+  is_missing          Boolean      @default(false)
+  is_billed           Boolean      @default(false)
+  user_purchase_id    Int
+}
