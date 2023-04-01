@@ -78,7 +78,11 @@ export function AuthInteraction() {
         <>
           <span className="text-white">{user?.email}</span>
           <div className="whitespace-nowrap text-purple-100 font-semibold text-xs">
-            <button onClick={onLogout} aria-label="Fazer logout (sair)">
+            <button
+              onClick={onLogout}
+              aria-label="Fazer logout (sair)"
+              title="Fazer logout (sair)"
+            >
               Sair
             </button>
           </div>
