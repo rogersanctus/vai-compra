@@ -1,65 +1,52 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { UserCircleIcon } from '@heroicons/react/20/solid'
+import { useAppDispatch, useAppSelector } from '@/stores'
+import { actions } from '@/stores/actions'
+import { fetchClarify, fetchIsLoggedIn } from '@/stores/auth'
+import { useRouter } from 'next/navigation'
 
-interface User {
-  name: string
-  email: string
-}
+const { authAction } = actions
 
 export function AuthInteraction() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
+  const auth = useAppSelector((state) => state.auth)
+  const router = useRouter()
+
+  const dispatch = useAppDispatch()
 
   function reset() {
-    setIsLoggedIn(false)
-    setUser(null)
+    authAction.reset()
   }
 
   useEffect(() => {
-    async function loadUser() {
-      try {
-        const resHasSession = await fetch('/api/auth/has-session')
-
-        if (!resHasSession.ok) {
-          throw new Error('Could not get information about the auth session')
-        }
-
-        const { hasSession } = await resHasSession.json()
-
-        if (hasSession) {
-          const res = await fetch('/api/auth/clarify')
-
-          if (!res.ok) {
-            throw new Error('Não autenticado')
-          }
-
-          const userData = await res.json()
-
-          if (userData) {
-            setUser(userData as User)
-            setIsLoggedIn(true)
-          }
-        } else {
-          reset()
-        }
-      } catch (error) {
-        console.error(error)
-        reset()
-      }
-    }
-
-    loadUser()
-
-    return reset
+    authAction.loadIsLoggedIn()
   }, [])
+
+  useEffect(() => {
+    if (auth.needToFetchIsLoggedIn) {
+      dispatch(fetchIsLoggedIn())
+    }
+  }, [auth.needToFetchIsLoggedIn, dispatch])
+
+  useEffect(() => {
+    if (auth.isLoggedIn && !auth.user) {
+      authAction.loadUser()
+    }
+  }, [auth.isLoggedIn, auth.user])
+
+  useEffect(() => {
+    if (auth.needToFetchUser) {
+      dispatch(fetchClarify())
+    }
+  }, [auth.needToFetchUser, dispatch])
 
   async function onLogout() {
     try {
       await fetch('/api/auth/login', { method: 'DELETE' })
 
       reset()
+      router.push('/')
     } catch (error) {
       console.error(error)
     }
@@ -67,16 +54,16 @@ export function AuthInteraction() {
 
   return (
     <div
-      title={isLoggedIn ? '' : 'Fazer login ou cadastrar'}
+      title={auth.isLoggedIn ? '' : 'Fazer login ou cadastrar'}
       className="flex flex-col items-center drop-shadow"
     >
       <UserCircleIcon
         className="text-white w-8 h-8"
-        title={isLoggedIn ? user?.name : ''}
+        title={auth.isLoggedIn ? auth.user?.name : ''}
       />
-      {isLoggedIn ? (
+      {auth.isLoggedIn ? (
         <>
-          <span className="text-white">{user?.email}</span>
+          <span className="text-white">{auth.user?.email}</span>
           <div className="whitespace-nowrap text-purple-100 font-semibold text-xs">
             <button
               onClick={onLogout}
