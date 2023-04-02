@@ -3,48 +3,66 @@
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { UserPlusIcon } from '@heroicons/react/20/solid'
-import { FormEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { MIN_PASSWORD_LENGTH } from '../consts'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'react-toastify'
+import { LoadingOverlay } from '@/components/LoadingOverlay'
 
-interface SignupError {
-  passwordConfirmation?: string
-}
+const signupSchema = z
+  .object({
+    name: z.string().nonempty('O nome é obrigatório'),
+    email: z
+      .string()
+      .nonempty('O e-mail é obrigatório')
+      .email('E-mail inválido'),
+    birthdate: z.coerce.date(),
+    password: z
+      .string()
+      .min(
+        MIN_PASSWORD_LENGTH,
+        `A senha deve possuir no mínimo ${MIN_PASSWORD_LENGTH}`
+      ),
+    passwordConfirmation: z
+      .string()
+      .min(
+        MIN_PASSWORD_LENGTH,
+        `A senha deve possuir no mínimo ${MIN_PASSWORD_LENGTH}`
+      )
+  })
+  .refine((data) => data.password === data.passwordConfirmation, {
+    message: 'A confirmação da senha não bate com a senha informada',
+    path: ['passwordConfirmation']
+  })
+
+type SignupSchema = z.infer<typeof signupSchema>
 
 export default function Signup() {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [birthdate, setBirthdate] = useState('')
-  const [password, setPassword] = useState('')
-  const [passwordConfirmation, setPasswordConfirmation] = useState('')
-  const [error, setError] = useState<SignupError>({})
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting }
+  } = useForm<SignupSchema>({
+    resolver: zodResolver(signupSchema)
+  })
+
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    setName('')
-    setEmail('')
-    setBirthdate('')
-    setPassword('')
-    setPasswordConfirmation('')
-  }, [])
+    setIsLoading(false)
+    reset()
+  }, [reset])
 
-  async function onSubmit(event: FormEvent) {
-    event.preventDefault()
-
-    if (password !== passwordConfirmation) {
-      setError({
-        passwordConfirmation:
-          'A confirmação da senha não bate com a senha informada'
-      })
-      return
-    }
-
+  const onSubmit: SubmitHandler<SignupSchema> = async (formData) => {
     try {
+      setIsLoading(true)
+
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
-        body: JSON.stringify({
-          name,
-          email,
-          birthdate,
-          password
-        })
+        body: JSON.stringify(formData)
       })
 
       if (!response.ok) {
@@ -52,68 +70,99 @@ export default function Signup() {
         throw data
       }
     } catch (error) {
+      toast(
+        'Falha ao tentar realizar cadastro. Por favor, tente novamente mais tarde.',
+        {
+          type: 'error',
+          position: 'bottom-right'
+        }
+      )
       console.error(error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex h-full p-8 items-center justify-center">
+    <div className="flex h-full p-8 items-center justify-center relative">
+      <LoadingOverlay isLoading={isLoading} />
       <form
         className="flex flex-col gap-4 min-w-[400px] items-center"
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit(onSubmit)}
       >
         <span className="text-4xl text-sky-500 font-semibold drop-shadow-sm mb-4">
           Cadastrar usuário
         </span>
-        <Input
-          type="text"
-          name="name"
-          placeholder="Seu nome completo"
-          className="w-full"
-          onChange={(event) => setName(event?.target.value)}
-          value={name}
-        />
-        <Input
-          type="email"
-          name="email"
-          placeholder="Seu e-mail"
-          className="w-full"
-          onChange={(event) => setEmail(event?.target.value)}
-          value={email}
-        />
-        <Input
-          type="date"
-          name="birthdate"
-          placeholder="Sua data de nascimento"
-          className="w-full"
-          onChange={(event) => setBirthdate(event?.target.value)}
-          value={birthdate}
-        />
-        <Input
-          type="password"
-          name="password"
-          placeholder="Sua senha"
-          className="w-full"
-          onChange={(event) => setPassword(event?.target.value)}
-          value={password}
-        />
-        <Input
-          type="password"
-          name="passwordConfirmation"
-          placeholder="Confirme sua senha"
-          className="w-full"
-          onChange={(event) => setPasswordConfirmation(event?.target.value)}
-          value={passwordConfirmation}
-        />
-        {error.passwordConfirmation ? (
-          <div className="text-rose-500">
-            <span>{error.passwordConfirmation}</span>
-          </div>
-        ) : null}
+        <div className="w-full">
+          <Input
+            type="text"
+            placeholder="Seu nome completo"
+            hasError={!!errors.name}
+            {...register('name')}
+          />
+          {errors.name && (
+            <span className="text-sm text-rose-500 font-semibold">
+              {errors.name?.message}
+            </span>
+          )}
+        </div>
+        <div className="w-full">
+          <Input
+            type="email"
+            placeholder="Seu e-mail"
+            hasError={!!errors.email}
+            {...register('email')}
+          />
+          {errors.email && (
+            <span className="text-sm text-rose-500 font-semibold">
+              {errors.email?.message}
+            </span>
+          )}
+        </div>
+        <div className="w-full">
+          <Input
+            type="date"
+            placeholder="Sua data de nascimento"
+            hasError={!!errors.birthdate}
+            {...register('birthdate')}
+          />
+          {errors.birthdate && (
+            <span className="text-sm text-rose-500 font-semibold">
+              {errors.birthdate?.message}
+            </span>
+          )}
+        </div>
+        <div className="w-full">
+          <Input
+            type="password"
+            placeholder="Sua senha"
+            hasError={!!errors.password}
+            {...register('password')}
+          />
+          {errors.password && (
+            <span className="text-sm text-rose-500 font-semibold">
+              {errors.password?.message}
+            </span>
+          )}
+        </div>
+        <div className="w-full">
+          <Input
+            type="password"
+            placeholder="Confirme sua senha"
+            hasError={!!errors.passwordConfirmation}
+            {...register('passwordConfirmation')}
+          />
+          {errors.passwordConfirmation && (
+            <span className="text-sm text-rose-500 font-semibold">
+              {errors.passwordConfirmation?.message}
+            </span>
+          )}
+        </div>
         <Button
           variant="primary"
           className="flex w-full items-center justify-center gap-2"
           size="lg"
+          disabled={isSubmitting || isLoading}
         >
           <UserPlusIcon className="w-6 h-6" />
           <span>Cadastrar</span>
