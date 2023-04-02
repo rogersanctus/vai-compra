@@ -41,7 +41,7 @@ function AppendHeader() {
   )
 }
 
-export default function RootLayout({ children }: HomeLayoutProps) {
+export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
     <>
       <Header prepend={<PrependHeader />} append={<AppendHeader />} />

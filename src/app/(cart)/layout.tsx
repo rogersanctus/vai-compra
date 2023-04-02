@@ -9,7 +9,7 @@ interface CartLayoutProps {
   children: React.ReactNode
 }
 
-export default function RootLayout({ children }: CartLayoutProps) {
+export default function CartLayout({ children }: CartLayoutProps) {
   return (
     <>
       <Header />

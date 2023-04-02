@@ -9,7 +9,7 @@ interface AuthLayoutProps {
   children: React.ReactNode
 }
 
-export default function RootLayout({ children }: AuthLayoutProps) {
+export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <div className="flex flex-col h-screen">
       <Header isAuthPage />
