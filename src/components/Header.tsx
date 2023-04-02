@@ -17,6 +17,7 @@ export function Header({ prepend, append, isAuthPage = false }: HeaderProps) {
           width="120"
           height="120"
           className="drop-shadow-lg"
+          priority
         />
         <span className="text-white text-4xl font-bold ml-2 drop-shadow-md">
           Compra
