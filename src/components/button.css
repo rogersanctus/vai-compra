@@ -1,55 +1,55 @@
 .button {
   @apply transition-colors;
-  @apply hover:shadow-lg;
+  @apply enabled:hover:shadow-lg;
 }
 
 .button.button-primary {
   @apply bg-sky-600;
   @apply text-white;
 
-  @apply hover:bg-sky-700;
+  @apply enabled:hover:bg-sky-700;
 }
 
 .button.button-secondary {
   @apply bg-amber-500;
   @apply text-white;
 
-  @apply hover:bg-amber-500/90;
+  @apply enabled:hover:bg-amber-500/90;
 }
 
 .button.button-success {
   @apply bg-emerald-600;
   @apply text-white;
 
-  @apply hover:bg-emerald-700;
+  @apply enabled:hover:bg-emerald-700;
 }
 
 .button.button-info {
   @apply bg-cyan-500;
   @apply text-white;
 
-  @apply hover:bg-cyan-600;
+  @apply enabled:hover:bg-cyan-600;
 }
 
 .button.button-warning {
   @apply bg-yellow-500;
   @apply text-white;
 
-  @apply hover:bg-yellow-600;
+  @apply enabled:hover:bg-yellow-600;
 }
 
 .button.button-error {
   @apply bg-rose-500;
   @apply text-white;
 
-  @apply hover:bg-rose-700;
+  @apply enabled:hover:bg-rose-700;
 }
 
 .button.button-dark {
   @apply bg-slate-700;
   @apply text-white;
 
-  @apply hover:bg-slate-800;
+  @apply enabled:hover:bg-slate-800;
 }
 
 .button.button-xs {

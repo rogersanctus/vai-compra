@@ -34,7 +34,7 @@ export function Button({
       {...props}
       className={`${props.className} button button-${variant} button-${size} ${
         squared ? 'rounded-none' : 'rounded-md'
-      } px-4 py-2 font-semibold`}
+      } px-4 py-2 font-semibold disabled:cursor-not-allowed disabled:saturate-50`}
     >
       {children}{' '}
     </button>
