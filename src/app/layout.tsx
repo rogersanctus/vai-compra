@@ -1,3 +1,4 @@
+import { ReduxClientProvider } from './ReduxClientProvider'
 import './globals.css'
 
 export const metadata = {
@@ -12,7 +13,9 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        <ReduxClientProvider>{children}</ReduxClientProvider>
+      </body>
     </html>
   )
 }
