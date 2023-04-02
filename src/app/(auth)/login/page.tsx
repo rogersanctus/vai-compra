@@ -5,6 +5,9 @@ import { Input } from '@/components/Input'
 import { ArrowRightOnRectangleIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useState } from 'react'
+import { actions } from '@/stores/actions'
+
+const { authAction } = actions
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -32,6 +35,8 @@ export default function Login() {
       }
 
       if (loginData.loggedIn) {
+        authAction.setIsLoggedIn(true)
+        authAction.setUser(null)
         router.push('/')
       }
     } catch (error) {
