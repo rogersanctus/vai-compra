@@ -12,7 +12,7 @@ export interface Auth {
 }
 
 const initialState: Auth = {
-  isLoading: false,
+  isLoading: true,
   isLoggedIn: false,
   user: null,
   needToFetchIsLoggedIn: false,
@@ -75,6 +75,7 @@ export const auth = createSlice({
       } else {
         state.needToFetchUser = true
       }
+      state.isLoading = false
     },
     setIsLoggedIn: (state, action: PayloadAction<boolean>) => {
       state.isLoggedIn = action.payload
@@ -99,6 +100,7 @@ export const auth = createSlice({
     })
     builder.addCase(fetchIsLoggedIn.rejected, (state) => {
       state.isLoggedIn = false
+      state.isLoading = false
     })
 
     builder.addCase(fetchClarify.pending, (state) => {
@@ -118,6 +120,7 @@ export const auth = createSlice({
     builder.addCase(fetchClarify.rejected, (state) => {
       state.isLoggedIn = false
       state.user = null
+      state.isLoading = false
     })
   }
 })
