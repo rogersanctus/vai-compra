@@ -12,6 +12,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { MIN_PASSWORD_LENGTH } from '../consts'
 import { toast } from 'react-toastify'
 import { LoadingOverlay } from '@/components/LoadingOverlay'
+import {
+  UserLoginError,
+  getLoginErrorMessage
+} from '@/lib/errors/UserLoginError'
 
 const { authAction } = actions
 
@@ -57,6 +61,9 @@ export default function Login() {
       const loginData = await response.json()
 
       if ('error' in loginData) {
+        if (response.status === 403) {
+          throw new UserLoginError(loginData.error)
+        }
         throw loginData.error
       }
 
@@ -67,10 +74,16 @@ export default function Login() {
       }
     } catch (error) {
       console.error(error)
-      toast(
-        'Falha ao tentar efetuar o login. Por favor, tente novamente mais tarde.',
-        { position: 'bottom-right', type: 'error' }
-      )
+
+      if (error instanceof UserLoginError) {
+        const message = getLoginErrorMessage(error.reason)
+        toast(message, { position: 'bottom-right', type: 'error' })
+      } else {
+        toast(
+          'Falha ao tentar efetuar o login. Por favor, tente novamente mais tarde.',
+          { position: 'bottom-right', type: 'error' }
+        )
+      }
     } finally {
       setIsLoading(false)
     }
