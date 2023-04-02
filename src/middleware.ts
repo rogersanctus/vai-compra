@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { importSPKI, jwtVerify } from 'jose'
-import { MissingEnvVariableError } from './lib/MissingEnvVariableError'
+import { MissingEnvVariableError } from './lib/errors/MissingEnvVariableError'
 
 const authPaths = ['/login', '/signup']
 

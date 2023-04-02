@@ -1,4 +1,4 @@
-import { MissingEnvVariableError } from '@/lib/MissingEnvVariableError'
+import { MissingEnvVariableError } from '@/lib/errors/MissingEnvVariableError'
 import { prismaClient } from '@/lib/prisma'
 import argon2 from 'argon2'
 

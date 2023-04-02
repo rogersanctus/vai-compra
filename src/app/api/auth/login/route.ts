@@ -3,7 +3,7 @@ import { ZodError, z } from 'zod'
 import { doLogin } from '../service'
 import { sessionOptions } from '@/lib/session'
 import { importPKCS8, importSPKI, jwtVerify, SignJWT } from 'jose'
-import { MissingEnvVariableError } from '@/lib/MissingEnvVariableError'
+import { MissingEnvVariableError } from '@/lib/errors/MissingEnvVariableError'
 
 export async function POST(request: NextRequest) {
   try {
