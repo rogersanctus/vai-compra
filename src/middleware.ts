@@ -3,6 +3,12 @@ import { importSPKI, jwtVerify } from 'jose'
 import { MissingEnvVariableError } from './lib/errors/MissingEnvVariableError'
 
 const authPaths = ['/login', '/signup']
+const protectedAPI = ['/api/products']
+
+const UnauthorizedResponse = NextResponse.json(
+  { error: { message: 'unauthorized' } },
+  { status: 401 }
+)
 
 /**
  * Check if a given `url` starts with one of the paths in the `paths` list.
@@ -18,6 +24,10 @@ function redirectIfNeeded(request: NextRequest, to: string) {
   }
 
   return NextResponse.redirect(new URL(to, request.url))
+}
+
+function isAPIRoute(request: NextRequest) {
+  return request.nextUrl.pathname.startsWith('/api')
 }
 
 async function middlewareForAuthSession(
@@ -38,7 +48,10 @@ async function middlewareForAuthSession(
 
     await jwtVerify(authSession, pubKey)
 
-    if (urlStartsWithSome(request.nextUrl.pathname, authPaths)) {
+    if (
+      !isAPIRoute(request) &&
+      urlStartsWithSome(request.nextUrl.pathname, authPaths)
+    ) {
       return NextResponse.redirect(new URL('/', request.url))
     }
   } catch (error) {
@@ -50,7 +63,14 @@ async function middlewareForAuthSession(
 
     console.error(retError)
 
-    if (!urlStartsWithSome(request.nextUrl.pathname, authPaths)) {
+    if (urlStartsWithSome(request.nextUrl.pathname, protectedAPI)) {
+      return UnauthorizedResponse
+    }
+
+    if (
+      !isAPIRoute(request) &&
+      !urlStartsWithSome(request.nextUrl.pathname, authPaths)
+    ) {
       return redirectIfNeeded(request, '/login')
     }
   }
@@ -64,16 +84,24 @@ export async function middleware(request: NextRequest) {
     return middlewareForAuthSession(request, authSession.value)
   }
 
+  // protected API path
+  if (urlStartsWithSome(request.nextUrl.pathname, protectedAPI)) {
+    //return NextResponse.redirect(new URL('/api/unauthorized', request.url))
+    return UnauthorizedResponse
+  }
+
   // Will not redirect if the next url is an Auth route
   if (urlStartsWithSome(request.nextUrl.pathname, authPaths)) {
     return
   }
 
   // No auth session and going to a not allowed route, redirect to login
-  return NextResponse.redirect(new URL('/login', request.url))
+  if (!isAPIRoute(request)) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
 }
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/cart/:path*', '/login/:path*', '/signup/:path*']
+  matcher: ['/cart/:path*', '/login/:path*', '/signup/:path*', '/api/:path*']
 }
