@@ -78,6 +78,7 @@ export const auth = createSlice({
     },
     setIsLoggedIn: (state, action: PayloadAction<boolean>) => {
       state.isLoggedIn = action.payload
+      sessionStorage.setItem('isLoggedIn', String(action.payload))
     },
     setUser: (state, action: PayloadAction<AuthUser | null>) => {
       state.user = action.payload
