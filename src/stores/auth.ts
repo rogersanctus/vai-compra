@@ -85,7 +85,11 @@ export const auth = createSlice({
       state.user = action.payload
     },
     reset: () => {
-      return initialState
+      return { ...initialState, isLoading: false }
+    },
+    clearSession: (state) => {
+      sessionStorage.removeItem('isLoggedIn')
+      sessionStorage.removeItem('user')
     }
   },
   extraReducers: (builder) => {

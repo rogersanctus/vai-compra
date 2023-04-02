@@ -15,10 +15,6 @@ export function AuthInteraction() {
 
   const dispatch = useAppDispatch()
 
-  function reset() {
-    authAction.reset()
-  }
-
   useEffect(() => {
     authAction.loadIsLoggedIn()
   }, [])
@@ -46,7 +42,8 @@ export function AuthInteraction() {
       try {
         await fetch('/api/auth/login', { method: 'DELETE' })
 
-        reset()
+        authAction.reset()
+        authAction.clearSession()
         router.push('/')
       } catch (error) {
         console.error(error)
