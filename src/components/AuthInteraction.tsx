@@ -88,14 +88,19 @@ export function AuthInteraction() {
       title={auth.isLoggedIn ? '' : 'Fazer login ou cadastrar'}
       className="flex flex-col items-center drop-shadow"
     >
-      <UserCircleIcon
-        className="text-white w-8 h-8"
-        title={auth.isLoggedIn ? auth.user?.name : ''}
-      />
       {auth.isLoading ? (
-        <div className="mt-1 bg-gray-300/80 rounded w-24 h-4"></div>
+        <>
+          <div className="bg-white/70 rounded-full w-8 h-8"></div>
+          <div className="mt-2 bg-white/70 rounded w-20 h-4"></div>
+        </>
       ) : (
-        <UserInfo />
+        <>
+          <UserCircleIcon
+            className="text-white w-8 h-8"
+            title={auth.isLoggedIn ? auth.user?.name : ''}
+          />
+          <UserInfo />
+        </>
       )}
     </div>
   )
