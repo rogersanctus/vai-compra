@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes } from 'react'
 import './button.css'
+import { BeatLoader, SyncLoader } from 'react-spinners'
 
 export const Variants = [
   'primary',
@@ -20,6 +21,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant
   squared?: boolean
   size?: Size
+  isLoading?: boolean
 }
 
 export function Button({
@@ -27,6 +29,7 @@ export function Button({
   variant = 'primary',
   squared = false,
   size = 'md',
+  isLoading = false,
   ...props
 }: ButtonProps) {
   return (
@@ -34,9 +37,15 @@ export function Button({
       {...props}
       className={`${props.className} button button-${variant} button-${size} ${
         squared ? 'rounded-none' : 'rounded-md'
-      } px-4 py-2 font-semibold disabled:cursor-not-allowed disabled:saturate-50`}
+      } min-w-max px-4 py-2 font-semibold disabled:cursor-not-allowed disabled:saturate-50`}
     >
-      {children}{' '}
+      {isLoading ? (
+        <div className="">
+          <BeatLoader size={8} color="white" margin={1} speedMultiplier={0.8} />
+        </div>
+      ) : (
+        children
+      )}
     </button>
   )
 }
