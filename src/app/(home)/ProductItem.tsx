@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from '@/components/Button'
 import { Product } from '@/models/product'
 import Image from 'next/image'
