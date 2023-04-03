@@ -19,14 +19,20 @@ const initialState: Products = {
   searchingTerms: null
 }
 
+// This fetch must always return a list. Do not rethrow anything
 async function fetchFavourites(): Promise<Favourite[]> {
-  const response = await fetch('/api/users/favourites')
+  try {
+    const response = await fetch('/api/users/favourites')
 
-  if (!response.ok) {
-    throw new Error('Could not get the favourites list')
+    if (!response.ok) {
+      throw new Error('Could not get the favourites list')
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error(error)
+    return []
   }
-
-  return await response.json()
 }
 
 async function fetchAllProducts(): Promise<Product[]> {

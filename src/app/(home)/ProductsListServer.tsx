@@ -9,14 +9,20 @@ interface ProductListProps {
   products?: Product[]
 }
 
+// This fetch must always return a list. Do not rethrow anything
 async function fetchFavourites(): Promise<Favourite[]> {
-  const response = await localFetch('/api/users/favourites')
+  try {
+    const response = await localFetch('/api/users/favourites')
 
-  if (!response.ok) {
-    throw new Error('Could not get the favourites list')
+    if (!response.ok) {
+      throw new Error('Could not get the favourites list')
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error(error)
+    return []
   }
-
-  return await response.json()
 }
 
 async function fetchProducts(): Promise<Product[]> {
