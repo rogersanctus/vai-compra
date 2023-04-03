@@ -1,12 +1,14 @@
-import { Product } from '@/models/product'
+import { productsMapper } from '@/lib/productsHelper'
+import { Favourite } from '@/models/favourite'
+import { Product, ProductWithFavourite } from '@/models/product'
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 const SliceName = 'products'
 
 export interface Products {
   isLoading?: boolean
-  products: Product[]
-  product: Product | null
+  products: ProductWithFavourite[]
+  product: ProductWithFavourite | null
   searchingTerms: string | null
 }
 
@@ -15,6 +17,27 @@ const initialState: Products = {
   products: [],
   product: null,
   searchingTerms: null
+}
+
+async function fetchFavourites(): Promise<Favourite[]> {
+  const response = await fetch('/api/users/favourites')
+
+  if (!response.ok) {
+    throw new Error('Could not get the favourites list')
+  }
+
+  return await response.json()
+}
+
+async function fetchAllProducts(): Promise<Product[]> {
+  const response = await fetch('/api/products')
+
+  if (!response.ok) {
+    throw new Error('Could not get product list')
+  }
+
+  const products = await response.json()
+  return products
 }
 
 export const fetchProduct = createAsyncThunk(
@@ -33,16 +56,7 @@ export const fetchProduct = createAsyncThunk(
 
 export const fetchProducts = createAsyncThunk(
   `${SliceName}/fetchProducts`,
-  async () => {
-    const response = await fetch('/api/products')
-
-    if (!response.ok) {
-      throw new Error('Could not get product list')
-    }
-
-    const products = await response.json()
-    return products
-  }
+  fetchAllProducts
 )
 
 export const searchProducts = createAsyncThunk(
@@ -53,18 +67,31 @@ export const searchProducts = createAsyncThunk(
   }: {
     search: string
     mustHaveAllTerms: boolean
-  }) => {
-    const queryStr = encodeURI(
-      `/api/products?search=${search}&all-terms=${mustHaveAllTerms}`
-    )
-    const response = await fetch(queryStr)
-
-    if (!response.ok) {
-      throw new Error('Could not search for products')
+  }): Promise<ProductWithFavourite[]> => {
+    if (!search || search.trim().length === 0) {
+      return fetchAllProducts()
     }
 
-    const result = await response.json()
-    return result
+    async function fetchProducts(): Promise<Product[]> {
+      const queryStr = encodeURI(
+        `/api/products?search=${search}&all-terms=${mustHaveAllTerms}`
+      )
+      const response = await fetch(queryStr)
+
+      if (!response.ok) {
+        throw new Error('Could not search for products')
+      }
+
+      const result = await response.json()
+      return result
+    }
+
+    const [favourites, products] = await Promise.all([
+      fetchFavourites(),
+      fetchProducts()
+    ])
+
+    return productsMapper(products, favourites)
   }
 )
 
@@ -74,6 +101,21 @@ export const products = createSlice({
   reducers: {
     setSearchingTerms: (state, action: PayloadAction<string | null>) => {
       state.searchingTerms = action.payload
+    },
+    updateProduct: (state, action: PayloadAction<ProductWithFavourite>) => {
+      const toFound = action.payload
+      const foundIndex = state.products.findIndex(
+        (product) => product.id === toFound.id
+      )
+
+      if (foundIndex !== -1) {
+        const copy = [...state.products]
+        copy.splice(foundIndex, 1, { ...toFound })
+        state.products = copy
+      }
+    },
+    resetProducts(state) {
+      state.products = []
     },
     reset: () => {
       return { ...initialState, isLoading: false }
