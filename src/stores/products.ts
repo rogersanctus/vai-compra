@@ -102,23 +102,34 @@ export const products = createSlice({
     setSearchingTerms: (state, action: PayloadAction<string | null>) => {
       state.searchingTerms = action.payload
     },
-    updateProduct: (state, action: PayloadAction<ProductWithFavourite>) => {
+    updateProductOnList: (
+      state,
+      action: PayloadAction<Partial<ProductWithFavourite>>
+    ) => {
       const toFound = action.payload
       const foundIndex = state.products.findIndex(
         (product) => product.id === toFound.id
       )
 
-      const previous = state.products
+      const previous = state.products[foundIndex]
 
       if (foundIndex !== -1) {
         const copy = [...state.products]
-        copy.splice(foundIndex, 1, { ...previous, ...toFound })
+        const newProduct = {
+          ...previous,
+          ...toFound
+        } as ProductWithFavourite
+
+        copy.splice(foundIndex, 1, newProduct)
 
         return {
           ...state,
           products: copy
         }
       }
+    },
+    setProductList(state, action: PayloadAction<ProductWithFavourite[]>) {
+      state.products = action.payload
     },
     resetProducts(state) {
       state.products = []
