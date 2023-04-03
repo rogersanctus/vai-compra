@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { useSelector, TypedUseSelectorHook, useDispatch } from 'react-redux'
 import { auth } from './auth'
+import { products } from './products'
 
 export const slices = {
-  auth
+  auth,
+  products
 }
 
 export type Slices = typeof slices
