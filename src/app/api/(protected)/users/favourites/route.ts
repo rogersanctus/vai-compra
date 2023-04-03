@@ -2,6 +2,11 @@ import { prismaClient } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserIdFromSession } from '../service'
 
+const resultSelect = {
+  product_external_id: true,
+  is_favourite: true
+}
+
 export async function GET(request: NextRequest) {
   try {
     const user_id = await getUserIdFromSession(request)
@@ -9,7 +14,8 @@ export async function GET(request: NextRequest) {
     const userProducts = await prismaClient.productUser.findMany({
       where: {
         user_id
-      }
+      },
+      select: resultSelect
     })
 
     return NextResponse.json(userProducts)
@@ -39,7 +45,8 @@ export async function PUT(request: NextRequest) {
         },
         where: {
           id: existingProductUser.id
-        }
+        },
+        select: resultSelect
       })
 
       return NextResponse.json(result)
@@ -50,7 +57,8 @@ export async function PUT(request: NextRequest) {
         is_favourite: params.is_favourite,
         user_id,
         product_external_id: params.product_id
-      }
+      },
+      select: resultSelect
     })
 
     return NextResponse.json(productUser)
