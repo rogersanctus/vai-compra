@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(products)
   } catch (error) {
-    if (typeof error === 'object' && (error as { message: string }).message) {
-      return NextResponse.json(error, { status: 400 })
+    if (error instanceof Error) {
+      return NextResponse.json(error, { status: 500 })
     }
 
     return new NextResponse('Unknown error: ' + JSON.stringify(error), {

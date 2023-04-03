@@ -12,7 +12,7 @@ export async function GET(
   if (!productId) {
     return NextResponse.json(
       { error: { message: 'missing_product_id' } },
-      { status: 404 }
+      { status: 400 }
     )
   }
 
@@ -28,7 +28,7 @@ export async function GET(
     return NextResponse.json(products)
   } catch (error) {
     if (error instanceof Error) {
-      return NextResponse.json(error, { status: 400 })
+      return NextResponse.json(error, { status: 500 })
     }
 
     return new NextResponse('Unknown error: ' + JSON.stringify(error), {
