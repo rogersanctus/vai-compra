@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 
 import { actions } from '@/stores/actions'
+import { Favourite } from '@/models/favourite'
 
 interface ProductProps {
   product: ProductWithFavourite
@@ -48,9 +49,14 @@ export function ProductItem({ product }: ProductProps) {
     setShowFavourite(false)
   }
 
+  function updateProductState(newState: Partial<ProductWithFavourite>) {
+    productsAction.updateProductOnList(newState)
+  }
+
   async function onFavouriteClick() {
     try {
       const is_favourite = !product.is_favourite
+      updateProductState({ id: product.id, is_favourite })
       const response = await fetch('/api/users/favourites', {
         body: JSON.stringify({
           product_id: product.id,
@@ -63,8 +69,12 @@ export function ProductItem({ product }: ProductProps) {
         throw new Error('Failed to favourite the product')
       }
 
-      const data = await response.json()
-      productsAction.updateProduct(data.is_favourite)
+      const data = (await response.json()) as Favourite
+
+      updateProductState({
+        id: data.product_external_id,
+        is_favourite: data.is_favourite
+      })
     } catch (error) {
       console.error(error)
       toast('Não foi possível favoritar o produto', {
