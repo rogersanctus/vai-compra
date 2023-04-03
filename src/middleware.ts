@@ -3,7 +3,7 @@ import { importSPKI, jwtVerify } from 'jose'
 import { MissingEnvVariableError } from './lib/errors/MissingEnvVariableError'
 
 const authPaths = ['/login', '/signup']
-const protectedAPI = ['/api/carts', '/api/purchases']
+const protectedAPI = ['/api/carts', '/api/purchases', '/api/users']
 
 const UnauthorizedResponse = NextResponse.json(
   { error: { message: 'unauthorized' } },
