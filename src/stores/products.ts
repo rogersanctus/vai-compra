@@ -54,7 +54,6 @@ export const searchProducts = createAsyncThunk(
     search: string
     mustHaveAllTerms: boolean
   }) => {
-    console.log('searchProducts ::', search, mustHaveAllTerms)
     const queryStr = encodeURI(
       `/api/products?search=${search}&all-terms=${mustHaveAllTerms}`
     )
@@ -104,16 +103,13 @@ export const products = createSlice({
     })
 
     builder.addCase(searchProducts.pending, (state) => {
-      console.log('searchProducts.pending')
       state.isLoading = true
     })
     builder.addCase(searchProducts.fulfilled, (state, action) => {
-      console.log('searchProducts.fulfilled')
       state.products = action.payload
       state.isLoading = false
     })
     builder.addCase(searchProducts.rejected, (state) => {
-      console.log('searchProducts.rejected')
       state.isLoading = false
     })
   }

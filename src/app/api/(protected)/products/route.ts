@@ -64,7 +64,7 @@ async function searchProduct(
       const withAllTerms = productPonctuations.filter(
         (product) => product.termsFound === keywords.length
       )
-      console.log(withAllTerms)
+
       result = withAllTerms
     }
 
