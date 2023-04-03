@@ -1,56 +1,24 @@
-import { Product, ProductWithFavourite } from '@/models/product'
-import { localFetch } from '../localApi'
+'use client'
+
+import { ProductWithFavourite } from '@/models/product'
 import { ProductItem } from './ProductItem'
-import { Favourite } from '@/models/favourite'
-import { productsMapper } from '@/lib/productsHelper'
+import { useEffect } from 'react'
+import { actions } from '@/stores/actions'
+import { useAppSelector } from '@/stores'
 
 interface ProductListProps {
   category?: string
-  products?: Product[]
+  products: ProductWithFavourite[]
 }
 
-async function fetchFavourites(): Promise<Favourite[]> {
-  const response = await localFetch('/api/users/favourites')
+const { productsAction } = actions
 
-  if (!response.ok) {
-    throw new Error('Could not get the favourites list')
-  }
+export function ProductsList({ category, products }: ProductListProps) {
+  const localProducts = useAppSelector((state) => state.products.products)
 
-  return await response.json()
-}
-
-async function fetchProducts(): Promise<Product[]> {
-  const response = await localFetch('/api/products')
-
-  if (!response.ok) {
-    throw new Error('Could not get products list')
-  }
-
-  return await response.json()
-}
-
-export const ProductsList = async function ({
-  category,
-  products
-}: ProductListProps) {
-  let localProducts: ProductWithFavourite[] = []
-
-  if (products) {
-    localProducts = products
-  } else {
-    try {
-      const [favourites, products] = await Promise.all([
-        fetchFavourites(),
-        fetchProducts()
-      ])
-
-      if (Array.isArray(favourites) && Array.isArray(products)) {
-        localProducts = productsMapper(products, favourites)
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  useEffect(() => {
+    productsAction.setProductList(products)
+  }, [products])
 
   return (
     <div className="flex flex-col px-20 pb-20">
@@ -64,4 +32,4 @@ export const ProductsList = async function ({
       </ul>
     </div>
   )
-} as unknown as (props: ProductListProps) => JSX.Element
+}
