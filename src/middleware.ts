@@ -3,7 +3,7 @@ import { importSPKI, jwtVerify } from 'jose'
 import { MissingEnvVariableError } from './lib/errors/MissingEnvVariableError'
 
 const authPaths = ['/login', '/signup']
-const protectedAPI = ['/api/products']
+const protectedAPI = ['/api/carts', '/api/purchases']
 
 const UnauthorizedResponse = NextResponse.json(
   { error: { message: 'unauthorized' } },
@@ -92,7 +92,7 @@ export async function middleware(request: NextRequest) {
 
   // Will not redirect if the next url is an Auth route
   if (urlStartsWithSome(request.nextUrl.pathname, authPaths)) {
-    return
+    return NextResponse.next()
   }
 
   // No auth session and going to a not allowed route, redirect to login
