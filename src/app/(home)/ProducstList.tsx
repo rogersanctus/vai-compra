@@ -1,32 +1,51 @@
-import { Product } from '@/models/product'
+import { Product, ProductWithFavourite } from '@/models/product'
 import { localFetch } from '../localApi'
 import { ProductItem } from './ProductItem'
+import { Favourite } from '@/models/favourite'
+import { productsMapper } from '@/lib/productsHelper'
 
 interface ProductListProps {
   category?: string
   products?: Product[]
 }
 
+async function fetchFavourites(): Promise<Favourite[]> {
+  const response = await localFetch('/api/users/favourites')
+
+  if (!response.ok) {
+    throw new Error('Could not get the favourites list')
+  }
+
+  return await response.json()
+}
+
+async function fetchProducts(): Promise<Product[]> {
+  const response = await localFetch('/api/products')
+
+  if (!response.ok) {
+    throw new Error('Could not get products list')
+  }
+
+  return await response.json()
+}
+
 export const ProductsList = async function ({
   category,
   products
 }: ProductListProps) {
-  let localProducts: Product[] = []
+  let localProducts: ProductWithFavourite[] = []
 
   if (products) {
     localProducts = products
   } else {
     try {
-      const response = await localFetch('/api/products')
+      const [favourites, products] = await Promise.all([
+        fetchFavourites(),
+        fetchProducts()
+      ])
 
-      if (!response.ok) {
-        throw new Error('Could not get products list')
-      }
-
-      const data = await response.json()
-
-      if (Array.isArray(data)) {
-        localProducts = data
+      if (Array.isArray(favourites) && Array.isArray(products)) {
+        localProducts = productsMapper(products, favourites)
       }
     } catch (error) {
       console.error(error)
