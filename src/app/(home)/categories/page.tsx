@@ -1,8 +1,8 @@
 import { localFetch } from '@/app/localApi'
 import { Product } from '@/models/product'
 import { redirect } from 'next/navigation'
-import { ProductsList } from '../ProducstList'
 import { CategoriesTranslated } from '../consts'
+import { ProductsListServer } from '../ProductsListServer'
 
 export default async function Categories({
   searchParams
@@ -27,7 +27,7 @@ export default async function Categories({
 
   return (
     <div>
-      <ProductsList products={products} category={categoryName} />
+      <ProductsListServer products={products} category={categoryName} />
     </div>
   )
 }
