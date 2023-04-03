@@ -65,7 +65,7 @@ model CartProduct {
 model ProductUser {
   id                  Int     @id @default(autoincrement())
   product_external_id Int
-  is_favorite         Boolean
+  is_favourite        Boolean
   user                User    @relation(fields: [user_id], references: [id])
   user_id             Int
 }
