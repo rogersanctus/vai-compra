@@ -1,14 +1,27 @@
-import { type NextRequest, NextResponse } from 'next/server'
-import { importSPKI, jwtVerify } from 'jose'
-import { MissingEnvVariableError } from './lib/errors/MissingEnvVariableError'
+import { NextRequest, NextResponse } from 'next/server'
+import { checkToken } from './lib/checkToken'
+import { InvalidTokenError } from './lib/errors/InvalidTokenError'
 
+const AuthSessionKey = 'auth-session'
 const authPaths = ['/login', '/signup']
 const protectedAPI = ['/api/carts', '/api/purchases', '/api/users']
 
-const UnauthorizedResponse = NextResponse.json(
-  { error: { message: 'unauthorized' } },
-  { status: 401 }
-)
+function sessionResponse(response: NextResponse, isInvalidToken: boolean) {
+  if (isInvalidToken) {
+    response.cookies.delete(AuthSessionKey)
+  }
+
+  return response
+}
+
+const UnauthorizedResponse = (isInvalidToken: boolean = false) => {
+  const res = NextResponse.json(
+    { error: { message: 'unauthorized' } },
+    { status: 401 }
+  )
+
+  return sessionResponse(res, isInvalidToken)
+}
 
 /**
  * Check if a given `url` starts with one of the paths in the `paths` list.
@@ -17,13 +30,19 @@ function urlStartsWithSome(url: string, paths: string[]) {
   return paths.some((path) => url.startsWith(path))
 }
 
-function redirectIfNeeded(request: NextRequest, to: string) {
+function redirectIfNeeded(
+  request: NextRequest,
+  to: string,
+  isInvalidToken: boolean = false
+) {
   // already in the to path
   if (request.nextUrl.pathname.startsWith(to)) {
     return
   }
 
-  return NextResponse.redirect(new URL(to, request.url))
+  const res = NextResponse.redirect(new URL(to, request.url))
+
+  return sessionResponse(res, isInvalidToken)
 }
 
 function isAPIRoute(request: NextRequest) {
@@ -35,18 +54,7 @@ async function middlewareForAuthSession(
   authSession: string
 ) {
   try {
-    if (!process.env.JWT_PUB_KEY) {
-      throw new MissingEnvVariableError('JWT_PUB_KEY')
-    }
-
-    if (!process.env.RSA_ALG) {
-      throw new MissingEnvVariableError('RSA_ALG')
-    }
-
-    const alg = process.env.RSA_ALG
-    const pubKey = await importSPKI(process.env.JWT_PUB_KEY, alg)
-
-    await jwtVerify(authSession, pubKey)
+    await checkToken(authSession)
 
     if (
       !isAPIRoute(request) &&
@@ -55,29 +63,29 @@ async function middlewareForAuthSession(
       return NextResponse.redirect(new URL('/', request.url))
     }
   } catch (error) {
-    let retError = 'The session token is invalid'
+    let isInvalidToken = error instanceof InvalidTokenError
 
-    if (error instanceof MissingEnvVariableError) {
-      retError = error.message
-    }
-
-    console.error(retError)
+    console.error(error)
 
     if (urlStartsWithSome(request.nextUrl.pathname, protectedAPI)) {
-      return UnauthorizedResponse
+      return UnauthorizedResponse(isInvalidToken)
     }
 
     if (
       !isAPIRoute(request) &&
       !urlStartsWithSome(request.nextUrl.pathname, authPaths)
     ) {
-      return redirectIfNeeded(request, '/login')
+      return redirectIfNeeded(request, '/login', isInvalidToken)
     }
+
+    const res = NextResponse.next()
+
+    return sessionResponse(res, isInvalidToken)
   }
 }
 
 export async function middleware(request: NextRequest) {
-  const authSession = request.cookies.get('auth-session')
+  const authSession = request.cookies.get(AuthSessionKey)
 
   // There is an auth session, must validate the token
   if (authSession) {
@@ -87,7 +95,7 @@ export async function middleware(request: NextRequest) {
   // protected API path
   if (urlStartsWithSome(request.nextUrl.pathname, protectedAPI)) {
     //return NextResponse.redirect(new URL('/api/unauthorized', request.url))
-    return UnauthorizedResponse
+    return UnauthorizedResponse()
   }
 
   // Will not redirect if the next url is an Auth route
