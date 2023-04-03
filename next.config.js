@@ -15,6 +15,14 @@ const nextConfig = {
   experimental: {
     appDir: true
   },
+  reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        hostname: 'fakestoreapi.com'
+      }
+    ]
+  },
   env: {
     JWT_PRIV_KEY: privKey,
     JWT_PUB_KEY: pubKey
