@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
-import { useAppDispatch } from '@/stores'
+import { useAppDispatch, useAppSelector } from '@/stores'
 import { searchProducts } from '@/stores/products'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -14,6 +14,7 @@ export const SearchProducts = function () {
   const [search, setSearch] = useState('')
   const [mustHaveAllTerms, setMustHaveAllTerms] = useState(false)
   const dispatch = useAppDispatch()
+  const isLoading = useAppSelector((state) => state.products.isLoading)
 
   const router = useRouter()
 
@@ -26,6 +27,7 @@ export const SearchProducts = function () {
   useEffect(() => {
     setSearch('')
     setMustHaveAllTerms(false)
+    productsAction.reset()
   }, [])
 
   return (
@@ -43,6 +45,8 @@ export const SearchProducts = function () {
           className="ml-2"
           variant="secondary"
           size="md"
+          isLoading={isLoading}
+          disabled={isLoading}
           onClick={onSearch}
         >
           Buscar
