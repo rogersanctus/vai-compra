@@ -1,16 +1,26 @@
 import Link from 'next/link'
 import { localFetch } from '../localApi'
+import { CategoriesTranslated } from './consts'
 
 export const Categories = async function () {
-  let categories: string[] = []
+  let categories: { name: string; link: string; translated: string }[] = []
 
   try {
     const response = await localFetch('/api/products/categories')
 
     if (response.ok) {
-      const categoriesData = await response.json()
+      const categoriesData = (await response.json()) as string[]
 
-      categories = categoriesData
+      categories = categoriesData.map((category) => {
+        return {
+          name: category,
+          link: encodeURI(`/categories?name=${category}`),
+          translated:
+            category in CategoriesTranslated
+              ? CategoriesTranslated[category]
+              : category
+        }
+      })
     }
   } catch (error) {
     console.error(error)
@@ -25,14 +35,14 @@ export const Categories = async function () {
         <ul className="flex">
           {categories.map((category) => (
             <li
-              key={category}
+              key={category.name}
               className="[&:not(:last-child)]:border-r border-slate-400 [&:not(:first-child)]:pl-4 [&:not(:last-child)]:pr-4"
             >
               <Link
-                href={`/product/category/${category}`}
+                href={category.link}
                 className="text-lg font-semibold uppercase text-slate-500 hover:text-slate-400"
               >
-                {category}
+                {category.translated}
               </Link>
             </li>
           ))}
