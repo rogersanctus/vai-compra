@@ -10,3 +10,7 @@ export interface Product {
     count: number
   }
 }
+
+export interface ProductWithFavourite extends Product {
+  is_favourite?: boolean
+}
