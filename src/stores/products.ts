@@ -108,10 +108,16 @@ export const products = createSlice({
         (product) => product.id === toFound.id
       )
 
+      const previous = state.products
+
       if (foundIndex !== -1) {
         const copy = [...state.products]
-        copy.splice(foundIndex, 1, { ...toFound })
-        state.products = copy
+        copy.splice(foundIndex, 1, { ...previous, ...toFound })
+
+        return {
+          ...state,
+          products: copy
+        }
       }
     },
     resetProducts(state) {
