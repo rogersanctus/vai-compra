@@ -1,7 +1,26 @@
 import { fetchOnApi } from '@/app/api/externalApi'
 import { NextRequest, NextResponse } from 'next/server'
+import { getProductsByCategory } from './getProductsByCategory'
 
 export async function GET(request: NextRequest) {
+  const url = new URL(request.url)
+  const name = url.searchParams.get('name')
+
+  if (name) {
+    try {
+      const products = await getProductsByCategory(name)
+
+      return NextResponse.json(products)
+    } catch (error) {
+      if (error instanceof Error) {
+        return NextResponse.json(error, { status: 500 })
+      }
+
+      return new NextResponse('Unknown error: ' + JSON.stringify(error), {
+        status: 500
+      })
+    }
+  }
   try {
     const response = await fetchOnApi('/products/categories')
 
