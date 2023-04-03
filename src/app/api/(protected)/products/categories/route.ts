@@ -9,9 +9,9 @@ export async function GET(request: NextRequest) {
       throw new Error('Could not fetch the product Categories from the api')
     }
 
-    const categories = await response.json()
+    const categories = (await response.json()) as string[]
 
-    return NextResponse.json(categories)
+    return NextResponse.json(['all', ...categories])
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json(error, { status: 500 })
