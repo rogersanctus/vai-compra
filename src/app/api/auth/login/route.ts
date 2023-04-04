@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { ZodError, z } from 'zod'
-import { doLogin } from '../service'
+import { doLogin } from '@/lib/services/auth'
 import { sessionOptions } from '@/lib/session'
 import { importPKCS8, importSPKI, jwtVerify, SignJWT } from 'jose'
 import { MissingEnvVariableError } from '@/lib/errors/MissingEnvVariableError'
