@@ -15,6 +15,7 @@ const nextConfig = {
   experimental: {
     appDir: true
   },
+  output: 'standalone',
   reactStrictMode: true,
   images: {
     remotePatterns: [
