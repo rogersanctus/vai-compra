@@ -6,10 +6,6 @@ export async function GET(request: NextRequest) {
   try {
     const authSession = request.cookies.get('auth-session')
 
-    if (!authSession) {
-      throw new Error('Missing the auth-session cookie')
-    }
-
     const { payload } = await checkToken(authSession?.value)
 
     const user = await prismaClient.user.findUnique({
