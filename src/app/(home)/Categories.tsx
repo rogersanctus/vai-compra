@@ -9,9 +9,12 @@ export const Categories = async function () {
     const categoriesRaw = await getCategories()
 
     categories = categoriesRaw.map((category) => {
+      const params = new URLSearchParams()
+      params.set('name', category)
+
       return {
         name: category,
-        link: encodeURI(`/categories?name=${category}`),
+        link: `/categories?${params.toString()}`,
         translated:
           category in CategoriesTranslated
             ? CategoriesTranslated[category]
