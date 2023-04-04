@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       throw new MissingEnvVariableError('CRYPTO_SALT')
     }
 
-    const salt = Buffer.from(process.env.CRYPTO_SALT ?? '', 'base64')
+    const salt = Buffer.from(process.env.CRYPTO_SALT, 'base64')
 
     const parsed = signupData.parse(data)
     const password_hash = await argon2.hash(parsed.password, {
