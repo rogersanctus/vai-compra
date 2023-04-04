@@ -1,6 +1,6 @@
 import { InvalidTokenError } from '@/lib/errors/InvalidTokenError'
 import { MissingEnvVariableError } from '@/lib/errors/MissingEnvVariableError'
-import { importSPKI, jwtVerify } from 'jose'
+import { SignJWT, importPKCS8, importSPKI, jwtVerify } from 'jose'
 
 export async function checkToken(token: string | undefined) {
   if (!token) {
@@ -43,4 +43,25 @@ export async function getUserIdFromSession(token: string | undefined) {
   const { payload } = await jwtVerify(token, pkey)
 
   return payload.id as number
+}
+
+export async function signJWT(payload: { id: number }) {
+  if (!process.env.JWT_PRIV_KEY) {
+    throw new MissingEnvVariableError('JWT_PRIV_KEY')
+  }
+
+  if (!process.env.RSA_ALG) {
+    throw new MissingEnvVariableError('RSA_ALG')
+  }
+
+  const alg = process.env.RSA_ALG
+  const privKeyEncoded = process.env.JWT_PRIV_KEY
+  const privKey = await importPKCS8(privKeyEncoded, alg)
+  return await new SignJWT(payload)
+    .setProtectedHeader({ alg })
+    .setIssuedAt()
+    .setExpirationTime(process.env.JWT_EXP_TIME ?? '24h')
+    .setIssuer('vai-compra')
+    .setAudience('vai-compra')
+    .sign(privKey)
 }
