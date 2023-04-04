@@ -94,7 +94,6 @@ export async function middleware(request: NextRequest) {
 
   // protected API path
   if (urlStartsWithSome(request.nextUrl.pathname, protectedAPI)) {
-    //return NextResponse.redirect(new URL('/api/unauthorized', request.url))
     return UnauthorizedResponse()
   }
 
