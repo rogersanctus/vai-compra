@@ -1,5 +1,7 @@
 import { Product } from '@/models/product'
 import { fetchOnApi } from '../externalApi'
+import { readdir } from 'fs/promises'
+import { join } from 'path'
 
 /*
  * The weights are empirical and were choosen
@@ -120,4 +122,22 @@ export async function getProductsByCategory(name: string) {
 
   const products = await response.json()
   return products as Product[]
+}
+
+export async function getProductImages(product: Product) {
+  const category = product.category
+
+  const imagesURL: string[] = []
+
+  const files = await readdir(join(process.cwd(), 'public/random-images'), {
+    withFileTypes: true
+  })
+
+  for (const file of files) {
+    if (!file.isDirectory() && file.name.startsWith(category)) {
+      imagesURL.push('random-images/' + file.name)
+    }
+  }
+
+  return imagesURL
 }
