@@ -1,4 +1,4 @@
-import { fetchOnApi } from '@/app/api/externalApi'
+import { fetchOnApi } from '@/lib/externalApi'
 import { NextRequest, NextResponse } from 'next/server'
 import { getProductsByCategory } from './getProductsByCategory'
 

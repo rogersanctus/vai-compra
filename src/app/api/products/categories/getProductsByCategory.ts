@@ -1,4 +1,4 @@
-import { fetchOnApi } from '@/app/api/externalApi'
+import { fetchOnApi } from '@/lib/externalApi'
 import { Product } from '@/models/product'
 
 export async function getProductsByCategory(name: string) {
