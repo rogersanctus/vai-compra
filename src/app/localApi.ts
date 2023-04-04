@@ -6,8 +6,11 @@ export async function localFetch(path: string, init?: RequestInit) {
   const url = headersList.get('host') || ''
   const fullUrl = new URL(path, `${protocol}://${url}`)
 
-  return await fetch(fullUrl, {
+  const response = await fetch(fullUrl, {
     ...init,
+    cache: 'no-cache',
     headers: headersList
   })
+
+  return response
 }
