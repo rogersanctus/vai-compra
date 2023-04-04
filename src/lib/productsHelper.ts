@@ -16,7 +16,7 @@ export function productsMapper(
 
     return {
       ...product,
-      is_favourite: favourite?.is_favourite
+      is_favourite: favourite?.is_favourite ?? false
     }
   })
 }
