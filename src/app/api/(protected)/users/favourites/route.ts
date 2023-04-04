@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserIdFromSession } from '@/lib/checkToken'
 import { getFavourites, updateFavourite } from '@/lib/services/favourites'
+import { getAuthUserId } from '@/lib/services/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    const authSession = request.cookies.get('auth-session')
-    const userId = await getUserIdFromSession(authSession?.value)
+    const userId = await getAuthUserId(request.cookies)
     const userProducts = await getFavourites(userId)
     return NextResponse.json(userProducts)
   } catch (error) {
@@ -15,8 +14,7 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const authSession = request.cookies.get('auth-session')
-    const userId = await getUserIdFromSession(authSession?.value)
+    const userId = await getAuthUserId(request.cookies)
     const params = await request.json()
 
     const productUser = await updateFavourite(userId, params)
