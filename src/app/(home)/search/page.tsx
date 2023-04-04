@@ -27,11 +27,17 @@ export default function SearchPage() {
           Resultados da busca por: {searchParam}
         </span>
       )}
-      <ul className="grid grid-cols-4 gap-5">
-        {products.map((product) => (
-          <ProductItem product={product} key={product.id} />
-        ))}
-      </ul>
+      {products.length === 0 ? (
+        <span className="text-gray-700 text-lg mt-auto py-20">
+          Nenhum resultado encontrado :(
+        </span>
+      ) : (
+        <ul className="grid grid-cols-4 gap-5">
+          {products.map((product) => (
+            <ProductItem product={product} key={product.id} />
+          ))}
+        </ul>
+      )}
     </div>
   )
 }
