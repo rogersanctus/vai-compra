@@ -1,6 +1,6 @@
 import { prismaClient } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserIdFromSession } from '../service'
+import { getUserIdFromSession } from '@/lib/checkToken'
 
 const resultSelect = {
   product_external_id: true,
@@ -9,7 +9,8 @@ const resultSelect = {
 
 export async function GET(request: NextRequest) {
   try {
-    const user_id = await getUserIdFromSession(request)
+    const authSession = request.cookies.get('auth-session')
+    const user_id = await getUserIdFromSession(authSession?.value)
 
     const userProducts = await prismaClient.productUser.findMany({
       where: {
@@ -27,7 +28,8 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const user_id = await getUserIdFromSession(request)
+    const authSession = request.cookies.get('auth-session')
+    const user_id = await getUserIdFromSession(authSession?.value)
     const params: { product_id: number; is_favourite: boolean } =
       await request.json()
 
