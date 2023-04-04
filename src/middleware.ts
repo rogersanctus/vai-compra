@@ -53,13 +53,12 @@ async function middlewareForAuthSession(
   request: NextRequest,
   authSession: string
 ) {
+  const pathname = request.nextUrl.pathname
+
   try {
     await checkToken(authSession)
 
-    if (
-      !isAPIRoute(request) &&
-      urlStartsWithSome(request.nextUrl.pathname, authPaths)
-    ) {
+    if (!isAPIRoute(request) && urlStartsWithSome(pathname, authPaths)) {
       return NextResponse.redirect(new URL('/', request.url))
     }
   } catch (error) {
@@ -67,14 +66,11 @@ async function middlewareForAuthSession(
 
     console.error(error)
 
-    if (urlStartsWithSome(request.nextUrl.pathname, protectedAPI)) {
+    if (urlStartsWithSome(pathname, protectedAPI)) {
       return UnauthorizedResponse(isInvalidToken)
     }
 
-    if (
-      !isAPIRoute(request) &&
-      !urlStartsWithSome(request.nextUrl.pathname, authPaths)
-    ) {
+    if (!isAPIRoute(request) && !urlStartsWithSome(pathname, authPaths)) {
       return redirectIfNeeded(request, '/login', isInvalidToken)
     }
 
@@ -86,6 +82,7 @@ async function middlewareForAuthSession(
 
 export async function middleware(request: NextRequest) {
   const authSession = request.cookies.get(AuthSessionKey)
+  const pathname = request.nextUrl.pathname
 
   // There is an auth session, must validate the token
   if (authSession) {
@@ -93,12 +90,12 @@ export async function middleware(request: NextRequest) {
   }
 
   // protected API path
-  if (urlStartsWithSome(request.nextUrl.pathname, protectedAPI)) {
+  if (urlStartsWithSome(pathname, protectedAPI)) {
     return UnauthorizedResponse()
   }
 
   // Will not redirect if the next url is an Auth route
-  if (urlStartsWithSome(request.nextUrl.pathname, authPaths)) {
+  if (urlStartsWithSome(pathname, authPaths)) {
     return NextResponse.next()
   }
 
