@@ -28,7 +28,7 @@ export default function SearchPage() {
         </span>
       )}
       {products.length === 0 ? (
-        <span className="text-gray-700 text-lg mt-auto py-20">
+        <span className="text-gray-700 text-lg">
           Nenhum resultado encontrado :(
         </span>
       ) : (
