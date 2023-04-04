@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { GetServerSidePropsContext } from 'next'
-import { fetchOnApi } from '@/app/api/externalApi'
+import { fetchOnApi } from '@/lib/externalApi'
 
 export async function GET(
   request: NextRequest,

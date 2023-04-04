@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchOnApi } from '../../externalApi'
+import { fetchOnApi } from '@/lib/externalApi'
 import { Product } from '@/models/product'
 
 /*
