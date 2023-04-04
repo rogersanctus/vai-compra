@@ -11,6 +11,7 @@ import { toast } from 'react-toastify'
 
 import { actions } from '@/stores/actions'
 import { Favourite } from '@/models/favourite'
+import { clientFetch } from '@/lib/clientFetch'
 
 interface ProductProps {
   product: ProductWithFavourite
@@ -57,7 +58,7 @@ export function ProductItem({ product }: ProductProps) {
     try {
       const is_favourite = !product.is_favourite
       updateProductState({ id: product.id, is_favourite })
-      const response = await fetch('/api/users/favourites', {
+      const response = await clientFetch('/api/users/favourites', {
         body: JSON.stringify({
           product_id: product.id,
           is_favourite

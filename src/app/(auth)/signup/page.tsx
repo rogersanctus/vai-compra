@@ -10,6 +10,7 @@ import { MIN_PASSWORD_LENGTH } from '../consts'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'react-toastify'
 import { LoadingOverlay } from '@/components/LoadingOverlay'
+import { clientFetch } from '@/lib/clientFetch'
 
 const signupSchema = z
   .object({
@@ -60,7 +61,7 @@ export default function Signup() {
     try {
       setIsLoading(true)
 
-      const response = await fetch('/api/auth/signup', {
+      const response = await clientFetch('/api/auth/signup', {
         method: 'POST',
         body: JSON.stringify(formData)
       })

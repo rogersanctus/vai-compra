@@ -1,3 +1,4 @@
+import { clientFetch } from '@/lib/clientFetch'
 import { AuthUser } from '@/models/authUser'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
@@ -22,7 +23,7 @@ const initialState: Auth = {
 export const fetchIsLoggedIn = createAsyncThunk(
   `${SliceName}/fetchIsLoggedIn`,
   async () => {
-    const resHasSession = await fetch('/api/auth/has-session')
+    const resHasSession = await clientFetch('/api/auth/has-session')
 
     if (!resHasSession.ok) {
       throw new Error('Could not get information about the auth session')
@@ -36,16 +37,21 @@ export const fetchIsLoggedIn = createAsyncThunk(
 export const fetchClarify = createAsyncThunk(
   `${SliceName}/fetchClarify`,
   async () => {
-    const res = await fetch('/api/auth/clarify')
+    try {
+      const res = await clientFetch('/api/auth/clarify')
 
-    if (!res.ok) {
-      throw new Error('Não autenticado')
+      if (!res.ok) {
+        throw new Error('Não autenticado')
+      }
+
+      const userData = await res.json()
+      sessionStorage.setItem('user', JSON.stringify(userData))
+
+      return userData
+    } catch (error) {
+      console.error(error)
+      throw error
     }
-
-    const userData = await res.json()
-    sessionStorage.setItem('user', JSON.stringify(userData))
-
-    return userData
   }
 )
 

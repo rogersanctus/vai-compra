@@ -1,3 +1,4 @@
+import { clientFetch } from '@/lib/clientFetch'
 import { productsMapper } from '@/lib/productsHelper'
 import { Favourite } from '@/models/favourite'
 import { Product, ProductWithFavourite } from '@/models/product'
@@ -22,7 +23,7 @@ const initialState: Products = {
 // This fetch must always return a list. Do not rethrow anything
 async function fetchFavourites(): Promise<Favourite[]> {
   try {
-    const response = await fetch('/api/users/favourites')
+    const response = await clientFetch('/api/users/favourites')
 
     if (!response.ok) {
       throw new Error('Could not get the favourites list')
@@ -36,20 +37,26 @@ async function fetchFavourites(): Promise<Favourite[]> {
 }
 
 async function fetchAllProducts(): Promise<Product[]> {
-  const response = await fetch('/api/products')
+  const response = await clientFetch('/api/products')
 
   if (!response.ok) {
     throw new Error('Could not get product list')
   }
 
-  const products = await response.json()
-  return products
+  try {
+    const products = await response.json()
+    return products
+  } catch (error) {
+    console.error(error)
+  }
+
+  return []
 }
 
 export const fetchProduct = createAsyncThunk(
   `${SliceName}/fetchProduct`,
   async (productId: number) => {
-    const response = await fetch(`/api/products/${productId}`)
+    const response = await clientFetch(`/api/products/${productId}`)
 
     if (!response.ok) {
       throw new Error('Could not get product list')
@@ -82,7 +89,7 @@ export const searchProducts = createAsyncThunk(
       const queryStr = encodeURI(
         `/api/products?search=${search}&all-terms=${mustHaveAllTerms}`
       )
-      const response = await fetch(queryStr)
+      const response = await clientFetch(queryStr)
 
       if (!response.ok) {
         throw new Error('Could not search for products')

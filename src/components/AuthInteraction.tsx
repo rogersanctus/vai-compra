@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/stores'
 import { actions } from '@/stores/actions'
 import { fetchClarify, fetchIsLoggedIn } from '@/stores/auth'
 import { useRouter } from 'next/navigation'
+import { clientFetch } from '@/lib/clientFetch'
 
 const { authAction } = actions
 
@@ -40,7 +41,7 @@ export function AuthInteraction() {
   const UserInfo = useCallback(() => {
     async function onLogout() {
       try {
-        await fetch('/api/auth/login', { method: 'DELETE' })
+        await clientFetch('/api/auth/login', { method: 'DELETE' })
 
         authAction.reset()
         authAction.clearSession()

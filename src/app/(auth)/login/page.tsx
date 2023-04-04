@@ -16,6 +16,7 @@ import {
   UserLoginError,
   getLoginErrorMessage
 } from '@/lib/errors/UserLoginError'
+import { clientFetch } from '@/lib/clientFetch'
 
 const { authAction } = actions
 
@@ -53,7 +54,7 @@ export default function Login() {
     try {
       setIsLoading(true)
 
-      const response = await fetch('/api/auth/login', {
+      const response = await clientFetch('/api/auth/login', {
         body: JSON.stringify(formData),
         method: 'POST'
       })
