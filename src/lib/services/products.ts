@@ -28,6 +28,16 @@ function calcPonctuationOrder(searching: string[], target: string) {
   return { ponctuation, terms }
 }
 
+export async function getProduct(productId: number) {
+  const response = await fetchOnApi(`/products/${productId}`)
+
+  if (!response.ok) {
+    throw new Error('Could not fetch the Products from the api')
+  }
+
+  return await response.json()
+}
+
 export async function getAllProducts() {
   const response = await fetchOnApi('/products')
 

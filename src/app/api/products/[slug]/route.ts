@@ -1,34 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { GetServerSidePropsContext } from 'next'
-import { fetchOnApi } from '@/lib/externalApi'
+import { getProduct } from '@/lib/services/products'
 
 export async function GET(
-  request: NextRequest,
+  _: NextRequest,
   { params }: GetServerSidePropsContext<{ slug: string }>
 ) {
-  const productId = params?.slug
-
-  if (!productId) {
-    return NextResponse.json(
-      { error: { message: 'missing_product_id' } },
-      { status: 400 }
-    )
-  }
+  const productIdParam = params?.slug
 
   try {
-    const response = await fetchOnApi(`/products/${productId}`)
-
-    if (!response.ok) {
-      throw new Error('Could not fetch the Products from the api')
+    if (!productIdParam) {
+      throw new Error('missing_product_id')
     }
 
-    const products = await response.json()
+    const productId = Number(productIdParam)
+
+    if (isNaN(productId)) {
+      throw new Error('wrong_product_id_type')
+    }
+
+    const products = getProduct(productId)
 
     return NextResponse.json(products)
   } catch (error) {
     if (error instanceof Error) {
-      return NextResponse.json(error, { status: 500 })
+      return NextResponse.json(error, { status: 400 })
     }
 
     return new NextResponse('Unknown error: ' + JSON.stringify(error), {
