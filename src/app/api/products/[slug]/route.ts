@@ -20,9 +20,9 @@ export async function GET(
       throw new Error('wrong_product_id_type')
     }
 
-    const products = getProduct(productId)
+    const product = await getProduct(productId)
 
-    return NextResponse.json(products)
+    return NextResponse.json(product)
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json(error, { status: 400 })
