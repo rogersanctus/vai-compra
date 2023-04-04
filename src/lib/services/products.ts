@@ -88,3 +88,26 @@ export async function searchProduct(
 
   return pureResult.filter((product) => product.ponctuation > 0) as Product[]
 }
+
+export async function getCategories() {
+  const response = await fetchOnApi('/products/categories')
+
+  if (!response.ok) {
+    throw new Error('Could not fetch the product Categories from the api')
+  }
+
+  const categories = await response.json()
+
+  return ['all', ...categories]
+}
+
+export async function getProductsByCategory(name: string) {
+  const response = await fetchOnApi('/products/category/' + encodeURI(name))
+
+  if (!response.ok) {
+    throw new Error('Could not fetch the products of category from the api')
+  }
+
+  const products = await response.json()
+  return products as Product[]
+}

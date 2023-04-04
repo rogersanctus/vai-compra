@@ -1,6 +1,5 @@
-import { fetchOnApi } from '@/lib/externalApi'
+import { getCategories, getProductsByCategory } from '@/lib/services/products'
 import { NextRequest, NextResponse } from 'next/server'
-import { getProductsByCategory } from './getProductsByCategory'
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url)
@@ -23,15 +22,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const response = await fetchOnApi('/products/categories')
+    const categories = await getCategories()
 
-    if (!response.ok) {
-      throw new Error('Could not fetch the product Categories from the api')
-    }
-
-    const categories = await response.json()
-
-    return NextResponse.json(['all', ...categories])
+    return NextResponse.json(categories)
   } catch (error) {
     console.error(error)
 
