@@ -1,19 +1,30 @@
 'use client'
 
-import { useAppSelector } from '@/stores'
+import { useAppDispatch, useAppSelector } from '@/stores'
 import { ProductItem } from '../ProductItem'
+import { useSearchParams } from 'next/navigation'
+import { useEffect } from 'react'
+import { searchProducts } from '@/stores/products'
 
 export default function SearchPage() {
+  const params = useSearchParams()
+  const searchParam = params?.get('q')
+  const mustHaveAllTermsParam = params?.get('at')
+  const dispatch = useAppDispatch()
   const products = useAppSelector((state) => state.products.products)
-  const searchingTerms = useAppSelector(
-    (state) => state.products.searchingTerms
-  )
+
+  useEffect(() => {
+    const search = searchParam ?? ''
+    const mustHaveAllTerms = mustHaveAllTermsParam === '1'
+
+    dispatch(searchProducts({ search, mustHaveAllTerms }))
+  }, [searchParam, dispatch, mustHaveAllTermsParam])
 
   return (
     <div className="flex flex-col px-20 pb-20 pt-4">
-      {searchingTerms && (
+      {searchParam && (
         <span className="text-left text-2xl uppercase mb-4">
-          Resultados da busca por: {searchingTerms}
+          Resultados da busca por: {searchParam}
         </span>
       )}
       <ul className="grid grid-cols-4 gap-5">

@@ -2,9 +2,8 @@
 
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
-import { useAppDispatch, useAppSelector } from '@/stores'
-import { searchProducts } from '@/stores/products'
-import { usePathname, useRouter } from 'next/navigation'
+import { useAppSelector } from '@/stores'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { actions } from '@/stores/actions'
 
@@ -13,19 +12,19 @@ const { productsAction } = actions
 export const SearchProducts = function () {
   const [search, setSearch] = useState('')
   const [mustHaveAllTerms, setMustHaveAllTerms] = useState(false)
-  const dispatch = useAppDispatch()
+
   const isLoading = useAppSelector((state) => state.products.isLoading)
 
   const router = useRouter()
-  const pathname = usePathname()
 
   async function onSearch() {
-    productsAction.setSearchingTerms(search)
-    await dispatch(searchProducts({ search, mustHaveAllTerms }))
-
-    if (!pathname.startsWith('/search')) {
-      router.push('/search')
+    if (isLoading) {
+      return
     }
+    const searchURL = `/search?q=${encodeURI(search)}${
+      mustHaveAllTerms ? '&at=1' : ''
+    }`
+    router.push(searchURL)
   }
 
   useEffect(() => {
