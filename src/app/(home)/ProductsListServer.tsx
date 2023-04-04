@@ -1,8 +1,13 @@
 import { Product, ProductWithFavourite } from '@/models/product'
-import { localFetch } from '../localApi'
 import { Favourite } from '@/models/favourite'
 import { productsMapper } from '@/lib/productsHelper'
 import { ProductsList } from './ProducstList'
+import { getFavourites } from '@/lib/services/favourites'
+import { getAllProducts } from '@/lib/services/products'
+import { cookies } from 'next/headers'
+import { getAuthUserId } from '@/lib/services/auth'
+import { ReadonlyRequestCookies } from 'next/dist/server/app-render'
+import { RequestCookies } from 'next/dist/compiled/@edge-runtime/cookies'
 
 interface ProductListProps {
   category?: string
@@ -10,29 +15,20 @@ interface ProductListProps {
 }
 
 // This fetch must always return a list. Do not rethrow anything
-async function fetchFavourites(): Promise<Favourite[]> {
+async function fetchFavourites(
+  cookies: RequestCookies | ReadonlyRequestCookies
+): Promise<Favourite[]> {
   try {
-    const response = await localFetch('/api/users/favourites')
-
-    if (!response.ok) {
-      throw new Error('Could not get the favourites list')
-    }
-
-    return await response.json()
+    const userId = await getAuthUserId(cookies)
+    return await getFavourites(userId)
   } catch (error) {
-    console.error(error)
+    console.info(error)
     return []
   }
 }
 
 async function fetchProducts(): Promise<Product[]> {
-  const response = await localFetch('/api/products')
-
-  if (!response.ok) {
-    throw new Error('Could not get products list')
-  }
-
-  return await response.json()
+  return await getAllProducts()
 }
 
 export const ProductsListServer = async function ({
@@ -44,9 +40,11 @@ export const ProductsListServer = async function ({
   if (products) {
     localProducts = products
   } else {
+    const cookiesList = cookies()
+
     try {
       const [favourites, products] = await Promise.all([
-        fetchFavourites(),
+        fetchFavourites(cookiesList),
         fetchProducts()
       ])
 
@@ -54,7 +52,7 @@ export const ProductsListServer = async function ({
         localProducts = productsMapper(products, favourites)
       }
     } catch (error) {
-      console.error(error)
+      console.info(error)
     }
   }
 

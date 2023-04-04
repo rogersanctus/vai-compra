@@ -1,8 +1,8 @@
-import { localFetch } from '@/app/localApi'
 import { Product } from '@/models/product'
 import { redirect } from 'next/navigation'
 import { CategoriesTranslated } from '../consts'
 import { ProductsListServer } from '../ProductsListServer'
+import { getProductsByCategory } from '@/lib/services/products'
 
 export default async function Categories({
   searchParams
@@ -19,10 +19,10 @@ export default async function Categories({
 
   let products: Product[] = []
 
-  const response = await localFetch(`/api/products/categories?name=${name}`)
-
-  if (response.ok) {
-    products = await response.json()
+  try {
+    products = await getProductsByCategory(name)
+  } catch (error) {
+    console.info(error)
   }
 
   return (

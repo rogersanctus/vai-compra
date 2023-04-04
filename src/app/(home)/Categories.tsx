@@ -1,29 +1,25 @@
 import Link from 'next/link'
-import { localFetch } from '../localApi'
 import { CategoriesTranslated } from './consts'
+import { getCategories } from '@/lib/services/products'
 
 export const Categories = async function () {
   let categories: { name: string; link: string; translated: string }[] = []
 
   try {
-    const response = await localFetch('/api/products/categories')
+    const categoriesRaw = await getCategories()
 
-    if (response.ok) {
-      const categoriesData = (await response.json()) as string[]
-
-      categories = categoriesData.map((category) => {
-        return {
-          name: category,
-          link: encodeURI(`/categories?name=${category}`),
-          translated:
-            category in CategoriesTranslated
-              ? CategoriesTranslated[category]
-              : category
-        }
-      })
-    }
+    categories = categoriesRaw.map((category) => {
+      return {
+        name: category,
+        link: encodeURI(`/categories?name=${category}`),
+        translated:
+          category in CategoriesTranslated
+            ? CategoriesTranslated[category]
+            : category
+      }
+    })
   } catch (error) {
-    console.error(error)
+    console.info(error)
   }
 
   return (
