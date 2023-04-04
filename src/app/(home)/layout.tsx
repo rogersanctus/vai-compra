@@ -29,7 +29,7 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
     <>
       <Header prepend={<SearchProducts />} append={<AppendHeader />} />
-      <main>
+      <main className="flex flex-col flex-grow">
         <Categories />
         {children}
       </main>

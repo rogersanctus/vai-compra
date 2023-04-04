@@ -14,7 +14,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="pt-BR">
-      <body>
+      <body className="flex flex-col min-h-screen">
         <ReduxClientProvider>{children}</ReduxClientProvider>
       </body>
     </html>

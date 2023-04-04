@@ -12,7 +12,7 @@ interface FooterProps {
 
 export function Footer({ isAuthPage = false }: FooterProps) {
   return (
-    <footer className="bg-blue-800 p-0">
+    <footer className="bg-blue-800 p-0 mt-auto">
       {isAuthPage ? null : (
         <div className="flex bg-amber-500 px-10 py-4 items-center border-y border-amber-600 shadow">
           <div className="">
