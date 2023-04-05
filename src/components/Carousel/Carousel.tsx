@@ -21,12 +21,29 @@ export function Carousel({ items }: CarouselProps) {
     setCurrent(0)
   }, [])
 
+  useEffect(() => {
+    function onResize() {
+      const totalWidth = container.current?.clientWidth ?? 0
+      const itemWidth = totalWidth / showItems
+
+      if (container.current) {
+        container.current.style.transform = `translatex(calc(${
+          -current * itemWidth
+        }px))`
+      }
+    }
+
+    window.addEventListener('resize', onResize)
+
+    return () => window.removeEventListener('resize', onResize)
+  }, [current, showItems])
+
   function onItemMount(container: HTMLDivElement) {
     itemEl.current = container
   }
 
   function onNext() {
-    const totalWidth = screenEl.current?.clientWidth ?? 0
+    const totalWidth = container.current?.clientWidth ?? 0
     const itemWidth = totalWidth / showItems
     const newpos = current + 1
 
@@ -44,7 +61,7 @@ export function Carousel({ items }: CarouselProps) {
   }
 
   function onPrevious() {
-    const totalWidth = screenEl.current?.clientWidth ?? 0
+    const totalWidth = container.current?.clientWidth ?? 0
     const itemWidth = totalWidth / showItems
     const newpos = current - 1
 
