@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { CategoriesTranslated } from './consts'
 import { getCategories } from '@/lib/services/products'
 
@@ -37,12 +36,12 @@ export const Categories = async function () {
               key={category.name}
               className="[&:not(:last-child)]:border-r border-slate-400 [&:not(:first-child)]:pl-4 [&:not(:last-child)]:pr-4"
             >
-              <Link
+              <a
                 href={category.link}
                 className="text-lg font-semibold uppercase text-slate-500 hover:text-slate-400"
               >
                 {category.translated}
-              </Link>
+              </a>
             </li>
           ))}
         </ul>
