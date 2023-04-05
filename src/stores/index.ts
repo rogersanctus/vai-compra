@@ -2,9 +2,11 @@ import { configureStore } from '@reduxjs/toolkit'
 import { useSelector, TypedUseSelectorHook, useDispatch } from 'react-redux'
 import { auth } from './auth'
 import { products } from './products'
+import { cart } from './cart'
 
 export const slices = {
   auth,
+  cart,
   products
 }
 
