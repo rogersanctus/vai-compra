@@ -15,19 +15,23 @@ interface CartItemProps {
 export function CartItem({ product }: CartItemProps) {
   const { cartAction } = actions
   const dispatch = useAppDispatch()
-  const isLoading = useAppSelector((state) => state.cart.isLoading)
 
   useEffect(() => {
     cartAction.clearIsLoading()
   }, [cartAction])
 
-  const onChangeAmount = function (value: number) {
+  const onChangeAmount = async function (value: number) {
     const amount = value
 
     if (!isNaN(amount)) {
-      const newProduct = { ...product, amount }
-      cartAction.updateProduct(newProduct)
-      dispatch(updateCart(newProduct))
+      const newProduct = { ...product, amount, isLoading: true }
+
+      try {
+        cartAction.updateProduct(newProduct)
+        await dispatch(updateCart(newProduct))
+      } finally {
+        cartAction.updateProduct({ ...newProduct, isLoading: false })
+      }
     }
   }
 
@@ -70,7 +74,7 @@ export function CartItem({ product }: CartItemProps) {
         onAdd={onAddToCart}
         onRemove={onRemoveFromCart}
         value={product.amount}
-        isLoading={isLoading}
+        isLoading={product.isLoading}
       />
     </div>
   )
