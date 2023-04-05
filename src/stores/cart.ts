@@ -1,5 +1,5 @@
 import { clientFetch } from '@/lib/clientFetch'
-import { CartProduct } from '@/models/cart'
+import { Cart as CartModel, CartProduct } from '@/models/cart'
 
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
@@ -7,12 +7,12 @@ const SliceName = 'cart'
 
 export interface Cart {
   isLoading?: boolean
-  products: CartProduct[]
+  cart: CartModel | null
 }
 
 const initialState: Cart = {
-  isLoading: true,
-  products: []
+  cart: null,
+  isLoading: true
 }
 
 async function fetchCart(): Promise<Cart> {
@@ -27,7 +27,7 @@ async function fetchCart(): Promise<Cart> {
 
 export const updateCart = createAsyncThunk(
   `${SliceName}/updateCart`,
-  async function (product: CartProduct): Promise<CartProduct[]> {
+  async function (product: CartProduct): Promise<CartModel> {
     const response = await clientFetch('/api/carts/products', {
       body: JSON.stringify(product),
       method: 'PUT'
@@ -43,7 +43,7 @@ export const updateCart = createAsyncThunk(
 
 export const addToCart = createAsyncThunk(
   `${SliceName}/addToCart`,
-  async function (product: CartProduct): Promise<CartProduct[]> {
+  async function (product: CartProduct): Promise<CartModel> {
     const response = await clientFetch('/api/carts/products', {
       body: JSON.stringify(product),
       method: 'POST'
@@ -59,7 +59,7 @@ export const addToCart = createAsyncThunk(
 
 export const removeFromCart = createAsyncThunk(
   `${SliceName}/removeFromCart`,
-  async function (product: CartProduct): Promise<CartProduct[]> {
+  async function (product: CartProduct): Promise<CartModel> {
     const response = await clientFetch('/api/carts/products', {
       body: JSON.stringify(product),
       method: 'DELETE'
@@ -77,12 +77,43 @@ export const cart = createSlice({
   name: SliceName,
   initialState,
   reducers: {
-    setProductList(state, action: PayloadAction<CartProduct[]>) {
-      state.products = action.payload
+    updateProduct(state, action: PayloadAction<CartProduct>) {
+      const toFound = action.payload
+
+      if (!state.cart) {
+        return state
+      }
+
+      const foundIndex = state.cart.products.findIndex(
+        (product) => product.id === toFound.id
+      )
+
+      const previous = state.cart?.products[foundIndex]
+
+      if (foundIndex !== -1) {
+        const copy = [...state.cart?.products]
+        const newProduct = {
+          ...previous,
+          ...toFound
+        } as CartProduct
+
+        copy.splice(foundIndex, 1, newProduct)
+
+        state.cart.products = copy
+      }
     },
-    resetProducts(state) {
-      state.products = []
+    setCart(state, action: PayloadAction<CartModel>) {
+      state.cart = action.payload
     },
+
+    resetCart(state) {
+      state.cart = null
+    },
+
+    clearIsLoading(state) {
+      state.isLoading = false
+    },
+
     reset: () => {
       return { ...initialState, isLoading: false }
     }
@@ -92,7 +123,7 @@ export const cart = createSlice({
       state.isLoading = true
     })
     builder.addCase(updateCart.fulfilled, (state, action) => {
-      state.products = action.payload
+      state.cart = action.payload
       state.isLoading = false
     })
     builder.addCase(updateCart.rejected, (state) => {
@@ -103,7 +134,7 @@ export const cart = createSlice({
       state.isLoading = true
     })
     builder.addCase(addToCart.fulfilled, (state, action) => {
-      state.products = action.payload
+      state.cart = action.payload
       state.isLoading = false
     })
     builder.addCase(addToCart.rejected, (state) => {
@@ -114,7 +145,7 @@ export const cart = createSlice({
       state.isLoading = true
     })
     builder.addCase(removeFromCart.fulfilled, (state, action) => {
-      state.products = action.payload
+      state.cart = action.payload
       state.isLoading = false
     })
     builder.addCase(removeFromCart.rejected, (state) => {
