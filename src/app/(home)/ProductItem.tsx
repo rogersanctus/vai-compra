@@ -3,7 +3,11 @@
 import { Button } from '@/components/Button'
 import { ProductWithFavourite } from '@/models/product'
 import { useAppSelector } from '@/stores'
-import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline'
+import {
+  HeartIcon as HeartIconOutline,
+  ShoppingBagIcon,
+  ShoppingCartIcon
+} from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
@@ -118,9 +122,20 @@ export function ProductItem({ product }: ProductProps) {
           {price}
         </span>
       </div>
-      <div className="mt-4">
-        <Button className="w-full" variant="warning">
-          Comprar
+      <div className="flex mt-4">
+        <Button
+          className="flex justify-center w-full"
+          variant="warning"
+          title="Comprar"
+        >
+          <ShoppingBagIcon className="w-6 h-6" />
+        </Button>
+        <Button
+          className="flex justify-center w-full ml-2"
+          variant="dark"
+          title="Adicionar ao carrinho"
+        >
+          <ShoppingCartIcon className="w-6 h-6" />
         </Button>
       </div>
       {canShowFavourite && (product.is_favourite || showFavourite) ? (
