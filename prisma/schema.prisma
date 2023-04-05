@@ -47,9 +47,9 @@ model UserAccess {
 
 model Cart {
   id         Int           @id @default(autoincrement())
-  user       User?         @relation(fields: [user_id], references: [id])
+  user       User          @relation(fields: [user_id], references: [id])
   open       Boolean       @default(true)
-  user_id    Int?          @unique
+  user_id    Int           @unique
   products   CartProduct[]
   created_at DateTime      @default(now())
 }
