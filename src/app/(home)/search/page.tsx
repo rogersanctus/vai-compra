@@ -5,6 +5,7 @@ import { ProductItem } from '../ProductItem'
 import { useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { searchProducts } from '@/stores/products'
+import { LoadingOverlay } from '@/components/LoadingOverlay'
 
 export default function SearchPage() {
   const params = useSearchParams()
@@ -12,6 +13,7 @@ export default function SearchPage() {
   const mustHaveAllTermsParam = params?.get('at')
   const dispatch = useAppDispatch()
   const products = useAppSelector((state) => state.products.products)
+  const isLoading = useAppSelector((state) => state.products.isLoading)
 
   useEffect(() => {
     const search = searchParam ?? ''
@@ -19,6 +21,14 @@ export default function SearchPage() {
 
     dispatch(searchProducts({ search, mustHaveAllTerms }))
   }, [searchParam, dispatch, mustHaveAllTermsParam])
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-grow relative">
+        <LoadingOverlay isLoading />
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col px-20 pb-20 pt-4">
