@@ -113,7 +113,10 @@ export async function getCategories() {
   return ['all', ...categories]
 }
 
-export async function getProductsByCategory(name: string) {
+export async function getProductsByCategory(name?: string) {
+  if (!name) {
+    throw new Error('The name argument is required')
+  }
   const response = await fetchOnApi('/products/category/' + encodeURI(name))
 
   if (!response.ok) {
