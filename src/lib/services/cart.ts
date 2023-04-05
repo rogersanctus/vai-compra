@@ -1,14 +1,15 @@
-import { CartProduct } from '@/models/cart'
+import { Cart, CartProduct } from '@/models/cart'
 import { prismaClient } from '../prisma'
 import { getProduct } from './products'
 import { Product } from '@/models/product'
-import { CartProduct as CartProductModelFull } from '@prisma/client'
+import { CartProduct as CartProductModelFull, Prisma } from '@prisma/client'
 
 const cartSelect = {
   id: true,
   user_id: true,
   open: true,
   products: {
+    orderBy: { id: Prisma.SortOrder.asc },
     select: {
       amount: true,
       product_external_id: true
@@ -69,7 +70,7 @@ export async function getCart(userId: number) {
   return {
     ...cart,
     products: await Promise.all(productsPromises)
-  }
+  } as Cart
 }
 
 export async function updateCartProduct(
@@ -98,7 +99,14 @@ export async function updateCartProduct(
       select: cartSelect
     })
 
-    return cart
+    const productsPromises = cart.products.map((cartProduct) =>
+      mapCartProductWithProduct(cartProduct)
+    )
+
+    return {
+      ...cart,
+      products: await Promise.all(productsPromises)
+    } as Cart
   }
 
   const existingProduct = cart.products.find(
@@ -146,7 +154,14 @@ export async function updateCartProduct(
     select: cartSelect
   })
 
-  return cart
+  const productsPromises = cart.products.map((cartProduct) =>
+    mapCartProductWithProduct(cartProduct)
+  )
+
+  return {
+    ...cart,
+    products: await Promise.all(productsPromises)
+  } as Cart
 }
 
 export async function addToCart(userId: number, product: CartProduct) {
