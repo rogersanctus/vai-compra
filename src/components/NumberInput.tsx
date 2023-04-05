@@ -47,7 +47,6 @@ export function NumberInput({
     lastTime.current = new Date().getTime()
 
     if (lastTimeout.current) {
-      console.log('clearing the last timeout...')
       clearTimeout(lastTimeout.current)
     }
 
