@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { CategoriesTranslated } from '../consts'
 import { ProductsListServer } from '../ProductsListServer'
 import { getProductsByCategory } from '@/lib/services/products'
+import { cookies } from 'next/headers'
+import { mapProductsWithFavourites } from '../favourites'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,7 +27,12 @@ export default async function Categories({
   let products: Product[] = []
 
   try {
-    products = await getProductsByCategory(name)
+    const cookiesList = cookies()
+    products = await mapProductsWithFavourites<string>(
+      cookiesList,
+      getProductsByCategory,
+      name
+    )
   } catch (error) {
     console.info(error)
   }
