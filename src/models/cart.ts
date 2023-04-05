@@ -1,4 +1,3 @@
-import { Products } from '@/stores/products'
 import { Product } from './product'
 
 export interface CartProduct extends Product {
@@ -8,6 +7,6 @@ export interface CartProduct extends Product {
 export interface Cart {
   id: number
   user_id?: number
-  products: Products[]
+  products: CartProduct[]
   open: boolean
 }
