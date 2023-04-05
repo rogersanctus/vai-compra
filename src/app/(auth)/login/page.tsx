@@ -91,7 +91,7 @@ export default function Login() {
   }
 
   return (
-    <div className="flex h-full p-8 items-center justify-center relative">
+    <div className="flex flex-col h-full p-8 items-center justify-center relative">
       <LoadingOverlay isLoading={isLoading} />
       <form
         className="flex flex-col gap-4 min-w-[400px] items-center"
@@ -136,6 +136,16 @@ export default function Login() {
           <span>Entrar</span>
         </Button>
       </form>
+      <span className="text-lg text-gray-700 mt-6">
+        Não possui cadastro?{' '}
+        <a
+          href="/signup"
+          title="Fazer cadastro"
+          className="font-bold text-amber-500"
+        >
+          Faça seu cadastro
+        </a>
+      </span>
     </div>
   )
 }

@@ -85,7 +85,7 @@ export default function Signup() {
   }
 
   return (
-    <div className="flex h-full p-8 items-center justify-center relative">
+    <div className="flex flex-col h-full p-8 items-center justify-center relative">
       <LoadingOverlay isLoading={isLoading} />
       <form
         className="flex flex-col gap-4 min-w-[400px] items-center"
@@ -169,6 +169,16 @@ export default function Signup() {
           <span>Cadastrar</span>
         </Button>
       </form>
+      <span className="text-lg text-gray-700 mt-6">
+        Já possuo cadastro.{' '}
+        <a
+          href="/login"
+          title="Entrar (fazer login)"
+          className="font-bold text-amber-500"
+        >
+          Entrar
+        </a>
+      </span>
     </div>
   )
 }
