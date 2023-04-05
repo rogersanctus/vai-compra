@@ -62,11 +62,14 @@ export function Carousel({ items }: CarouselProps) {
   }
 
   return (
-    <div className="flex flex-grow relative mr-4 ">
+    <div
+      className={`flex flex-grow relative mr-4`}
+      style={{ marginLeft: `-${gap / 2}px` }}
+    >
       <div ref={screenEl} className="flex-grow flex overflow-x-hidden py-6">
         <div
           ref={container}
-          className={`flex flex-grow transition-transform ease-in `}
+          className={`flex flex-grow transition-transform duration-500 ease-out `}
         >
           {items.map((item, idx) => (
             <CarouselItem
