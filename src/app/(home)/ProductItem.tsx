@@ -12,6 +12,8 @@ import { toast } from 'react-toastify'
 import { actions } from '@/stores/actions'
 import { Favourite } from '@/models/favourite'
 import { clientFetch } from '@/lib/clientFetch'
+import Link from 'next/link'
+import { formatPrice } from '@/lib/number'
 
 interface ProductProps {
   product: ProductWithFavourite
@@ -23,10 +25,6 @@ export function ProductItem({ product }: ProductProps) {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn)
   const [showFavourite, setShowFavourite] = useState(false)
   const [canShowFavourite, setCanShowFavourite] = useState(false)
-  const formatter = Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: 'BRL'
-  })
 
   useEffect(() => {
     setShowFavourite(false)
@@ -52,6 +50,10 @@ export function ProductItem({ product }: ProductProps) {
 
   function updateProductState(newState: Partial<ProductWithFavourite>) {
     productsAction.updateProductOnList(newState)
+  }
+
+  function productUrl() {
+    return '/product/' + product.id
   }
 
   async function onFavouriteClick() {
@@ -85,10 +87,10 @@ export function ProductItem({ product }: ProductProps) {
     }
   }
 
-  const price = formatter.format(product.price)
+  const price = formatPrice(product.price)
   return (
     <li
-      className="cursor-pointer flex flex-col rounded shadow-lg border border-gray-200 p-4 h-[430px] justify-stretch relative"
+      className="flex flex-col rounded shadow-lg border border-gray-200 p-4 h-[430px] justify-stretch relative"
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
@@ -101,14 +103,16 @@ export function ProductItem({ product }: ProductProps) {
           sizes="800px"
         />
       </div>
-      <div className="flex cursor-pointer h-12 overflow-hidden my-3">
-        <span
-          className="w-full text-lg leading-tight font-semibold text-center line-clamp-2"
-          title={product.title}
-        >
-          {product.title}
-        </span>
-      </div>
+      <Link href={productUrl()}>
+        <div className="flex h-12 overflow-hidden my-3">
+          <span
+            className="w-full text-lg leading-tight font-semibold text-center line-clamp-2"
+            title={product.title}
+          >
+            {product.title}
+          </span>
+        </div>
+      </Link>
       <div className="flex justify-center mt-4">
         <span className="text-2xl font-bold text-lime-600 drop-shadow-sm">
           {price}
