@@ -102,7 +102,7 @@ export function Carousel({ items }: CarouselProps) {
       </div>
       {current === 0 ? null : (
         <button
-          className="text-gray-300 bg-zinc-50 rounded-full border border-zinc-200 shadow-md absolute left-0 top-1/2 -translate-y-1/2 w-16 h-16 p-4"
+          className="text-gray-300 bg-zinc-50 rounded-full border border-zinc-200 shadow-md absolute hover:drop-shadow-lg left-0 top-1/2 -translate-y-1/2 w-16 h-16 p-4"
           style={{ marginLeft: `calc(-1*(2rem - ${gap / 2}px))` }}
           onClick={onPrevious}
           disabled={current === 0}
@@ -112,7 +112,7 @@ export function Carousel({ items }: CarouselProps) {
       )}
       {current === items.length - showItems ? null : (
         <button
-          className="text-gray-300 bg-zinc-50 rounded-full border border-zinc-200 shadow-md absolute right-0 top-1/2 -translate-y-1/2 w-16 h-16 p-4"
+          className="text-gray-300 bg-zinc-50 rounded-full border border-zinc-200 shadow-md absolute hover:drop-shadow-lg right-0 top-1/2 -translate-y-1/2 w-16 h-16 p-4"
           style={{ marginRight: `calc(-1*(2rem - ${gap / 2}px))` }}
           onClick={onNext}
         >
