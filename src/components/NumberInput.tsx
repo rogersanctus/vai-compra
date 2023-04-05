@@ -2,7 +2,7 @@ import debounce from 'lodash/debounce'
 import { Button } from './Button'
 import { Input } from './Input'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { LoadingOverlay } from './LoadingOverlay'
+import { MoonLoader } from 'react-spinners'
 
 interface NumberInputProps {
   onAdd: (value: number) => void
@@ -60,7 +60,7 @@ export function NumberInput({
   }
 
   return (
-    <div className="flex flex-none ml-auto w-[200px]">
+    <div className="flex flex-none ml-auto w-[200px] relative">
       <Button
         variant="secondary"
         title="Remover um produto"
@@ -87,9 +87,9 @@ export function NumberInput({
         +
       </Button>
       {isLoading ? (
-        <div className="absolute left-0 w-full top-0 h-full bg-transparent">
-          <div className="relative">
-            <LoadingOverlay isLoading={isLoading} />
+        <div className="absolute flex left-0 w-full top-0 h-full bg-black/10 cursor-not-allowed">
+          <div className="relative flex-grow flex items-center justify-center">
+            <MoonLoader color="black" size={22} speedMultiplier={0.8} />
           </div>
         </div>
       ) : null}
