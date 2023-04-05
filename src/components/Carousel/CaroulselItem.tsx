@@ -22,7 +22,7 @@ export function CarouselItem({
   return (
     <>
       <div
-        className={`flex flex-col flex-none min-h-[300px] p-2 border border-slate-300 rounded shadow cursor-pointer hover:shadow-lg`}
+        className={`flex flex-col flex-none min-h-[300px] p-2 border border-slate-300 rounded shadow hover:shadow-lg`}
         ref={container}
         style={{
           marginLeft: `${gap / 2}px`,
