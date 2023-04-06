@@ -19,8 +19,10 @@ const initialState: Cart = {
 
 export const fetchCart = createAsyncThunk(
   `${SliceName}/fetchCart`,
-  async function (): Promise<CartModel> {
-    const response = await clientFetch('/api/carts')
+  async function (_, thunkApi): Promise<CartModel> {
+    const response = await clientFetch('/api/carts', {
+      signal: thunkApi.signal
+    })
 
     if (!response.ok) {
       throw new Error('Could not get the user cart')
@@ -32,8 +34,10 @@ export const fetchCart = createAsyncThunk(
 
 export const fetchCartProductsCount = createAsyncThunk(
   `${SliceName}/fetchCartProductsCount`,
-  async function (): Promise<{ count: number }> {
-    const response = await clientFetch('/api/carts/products/count')
+  async function (_, thunkApi): Promise<{ count: number }> {
+    const response = await clientFetch('/api/carts/products/count', {
+      signal: thunkApi.signal
+    })
 
     if (!response.ok) {
       throw new Error('Could not get the quantity of products on the cart')
@@ -45,10 +49,11 @@ export const fetchCartProductsCount = createAsyncThunk(
 
 export const updateCart = createAsyncThunk(
   `${SliceName}/updateCart`,
-  async function (product: CartProduct): Promise<CartModel> {
+  async function (product: CartProduct, thunkApi): Promise<CartModel> {
     const response = await clientFetch('/api/carts/products', {
       body: JSON.stringify(product),
-      method: 'PUT'
+      method: 'PUT',
+      signal: thunkApi.signal
     })
 
     if (!response.ok) {
@@ -61,10 +66,11 @@ export const updateCart = createAsyncThunk(
 
 export const addToCart = createAsyncThunk(
   `${SliceName}/addToCart`,
-  async function (product: CartProduct): Promise<CartModel> {
+  async function (product: CartProduct, thunkApi): Promise<CartModel> {
     const response = await clientFetch('/api/carts/products', {
       body: JSON.stringify(product),
-      method: 'POST'
+      method: 'POST',
+      signal: thunkApi.signal
     })
 
     if (!response.ok) {
@@ -77,10 +83,11 @@ export const addToCart = createAsyncThunk(
 
 export const removeFromCart = createAsyncThunk(
   `${SliceName}/removeFromCart`,
-  async function (product: CartProduct): Promise<CartModel> {
+  async function (product: CartProduct, thunkApi): Promise<CartModel> {
     const response = await clientFetch('/api/carts/products', {
       body: JSON.stringify(product),
-      method: 'DELETE'
+      method: 'DELETE',
+      signal: thunkApi.signal
     })
 
     if (!response.ok) {
