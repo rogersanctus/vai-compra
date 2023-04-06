@@ -4,10 +4,8 @@ import { Product } from '@/models/product'
 import { ProductImage } from './ProductImage'
 import { Rating } from '@/components/Rating'
 import { formatPrice } from '@/lib/number'
-import { Button } from '@/components/Button'
-import { ShoppingBagIcon } from '@heroicons/react/24/outline'
-import { ShoppingCartIcon } from '@heroicons/react/24/solid'
 import { ProductInfo } from './ProductInfo'
+import { ProductDetailsActions } from './ProductDetailsActions'
 
 export default async function ProductPage({
   params
@@ -53,24 +51,7 @@ export default async function ProductPage({
                 </span>
                 <p className="mt-8">{product.description}</p>
               </div>
-              <div className="flex mt-auto gap-4 justify-end">
-                <Button
-                  variant="dark"
-                  className="flex uppercase gap-1"
-                  size="lg"
-                >
-                  <ShoppingCartIcon className="w-6 h-6" />
-                  <span>Adicionar</span>
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="flex uppercase gap-1"
-                  size="lg"
-                >
-                  <ShoppingBagIcon className="w-6 h-6" />
-                  <span>Comprar</span>
-                </Button>
-              </div>
+              <ProductDetailsActions product={product} />
             </div>
           </div>
         </div>
