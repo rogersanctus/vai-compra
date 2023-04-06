@@ -9,12 +9,14 @@ export interface Cart {
   isLoading?: boolean
   cart: CartModel | null
   productsCount: number
+  isGoingToDetails: boolean
 }
 
 const initialState: Cart = {
   cart: null,
   productsCount: 0,
-  isLoading: true
+  isLoading: true,
+  isGoingToDetails: false
 }
 
 export const fetchCart = createAsyncThunk(
@@ -151,6 +153,10 @@ export const cart = createSlice({
 
     resetCart(state) {
       state.cart = null
+    },
+
+    setIsGoingToDetails(state, action: PayloadAction<boolean>) {
+      state.isGoingToDetails = action.payload
     },
 
     clearIsLoading(state) {
