@@ -10,8 +10,8 @@ export default async function CartPage() {
     const cart = await getCart(userId)
 
     return (
-      <div className="h-full w-full p-20">
-        <span className="text-3xl text-gray-600 font-bold">Carrinho</span>
+      <div className="flex flex-col flex-grow px-20 py-10 relative">
+        <span className="text-3xl text-gray-600 font-bold mb-8">Carrinho</span>
         {cart ? (
           <CartList cart={cart} />
         ) : (
