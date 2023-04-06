@@ -56,13 +56,31 @@ export function CartList({ cart }: CartClientProps) {
           </li>
         ))}
       </ul>
-      <div className="flex mt-6 justify-end">
-        <span className="text-lg">Total:</span>
-        <span className="text-2xl font-bold ml-6">{total}</span>
-      </div>
-      <div className="flex justify-end my-8">
-        <Button>Prosseguir com A compra</Button>
-      </div>
+      {localCart.products.length > 0 ? (
+        <>
+          <div className="flex mt-6 justify-end">
+            <span className="text-lg">Total:</span>
+            <span className="text-2xl font-bold ml-6">{total}</span>
+          </div>
+          <div className="flex justify-end my-8">
+            <Button>Prosseguir com A compra</Button>
+          </div>
+        </>
+      ) : (
+        <div className="text-zinc-500">
+          <p className="text-3xl italic mb-4">Seu carrinho está vazio.</p>
+          <p className="text-2xl font-semibold">
+            Que tal dar uma olhada em nossos produtos?{' '}
+            <a
+              className="text-lime-500 drop-shadow"
+              href="/"
+              title="Página dos produtos"
+            >
+              Confira
+            </a>
+          </p>
+        </div>
+      )}
     </div>
   )
 }
