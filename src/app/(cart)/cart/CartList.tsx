@@ -5,6 +5,7 @@ import { actions } from '@/stores/actions'
 import { useEffect } from 'react'
 import { CartItem } from './CartItem'
 import { useAppSelector } from '@/stores'
+import { LoadingOverlay } from '@/components/LoadingOverlay'
 
 interface CartClientProps {
   cart: Cart
@@ -18,12 +19,12 @@ export function CartList({ cart }: CartClientProps) {
     cartAction.setCart(cart)
   }, [cart, cartAction])
 
-  /*useEffect(() => {
-    cartAction.setProductList(cart.products)
-  }, [cart.products, cartAction])*/
-
   if (!localCart) {
-    return <div>Empty cart</div>
+    return (
+      <div className="flex-grow">
+        <LoadingOverlay isLoading />
+      </div>
+    )
   }
 
   return (
