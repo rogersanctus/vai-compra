@@ -43,8 +43,8 @@ const allTotalPriceSelector = createSelector(
 export default function CartSummary() {
   const dispatch = useAppDispatch()
   const router = useRouter()
-  const isGoingToDetails = useAppSelector(
-    (state) => state.cart.isGoingToDetails
+  const isGoingToCheckout = useAppSelector(
+    (state) => state.cart.isGoingToCheckout
   )
   const products = useAppSelector(productsSummarySelector)
   const fmtTotalPrice = useAppSelector(allTotalPriceSelector)
@@ -57,7 +57,7 @@ export default function CartSummary() {
       }
     }
 
-    if (isGoingToDetails) {
+    if (isGoingToCheckout) {
       abortFetchCart()
       const fetchCartPromise = dispatch(fetchCart())
       abortController.current = fetchCartPromise.abort
@@ -66,9 +66,9 @@ export default function CartSummary() {
     return () => {
       abortFetchCart()
     }
-  }, [isGoingToDetails, dispatch])
+  }, [isGoingToCheckout, dispatch])
 
-  if (!isGoingToDetails) {
+  if (!isGoingToCheckout) {
     router.push('/')
     return
   }
