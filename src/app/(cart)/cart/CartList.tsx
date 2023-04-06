@@ -63,7 +63,9 @@ export function CartList({ cart }: CartClientProps) {
             <span className="text-2xl font-bold ml-6">{total}</span>
           </div>
           <div className="flex justify-end my-8">
-            <Button>Prosseguir com A compra</Button>
+            <Button variant="success" size="lg">
+              Prosseguir com A compra
+            </Button>
           </div>
         </>
       ) : (
