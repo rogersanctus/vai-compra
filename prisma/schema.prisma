@@ -85,4 +85,5 @@ model UserPurchaseProduct {
   is_missing          Boolean      @default(false)
   is_billed           Boolean      @default(false)
   user_purchase_id    Int
+  amount              Int          @default(1)
 }
