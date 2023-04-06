@@ -57,20 +57,21 @@ export default function CartSummary() {
       }
     }
 
-    abortFetchCart()
-
-    const fetchCartPromise = dispatch(fetchCart())
-    abortController.current = fetchCartPromise.abort
+    if (isGoingToDetails) {
+      abortFetchCart()
+      const fetchCartPromise = dispatch(fetchCart())
+      abortController.current = fetchCartPromise.abort
+    }
 
     return () => {
       abortFetchCart()
     }
-  }, [dispatch])
+  }, [isGoingToDetails, dispatch])
 
-  /*if (!isGoingToDetails) {
+  if (!isGoingToDetails) {
     router.push('/')
     return
-  }*/
+  }
 
   return (
     <div className="px-20 py-10">
