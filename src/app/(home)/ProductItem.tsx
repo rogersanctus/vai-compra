@@ -18,7 +18,7 @@ import { Favourite } from '@/models/favourite'
 import { clientFetch } from '@/lib/clientFetch'
 import Link from 'next/link'
 import { formatPrice } from '@/lib/number'
-import { addToCart } from '@/stores/cart'
+import { addToCart, fetchCartProductsCount } from '@/stores/cart'
 
 interface ProductProps {
   product: ProductWithFavourite
@@ -111,6 +111,7 @@ export function ProductItem({ product }: ProductProps) {
         }
       )
     } finally {
+      dispatch(fetchCartProductsCount())
       productsAction.updateProductOnList({ ...product, isLoading: false })
     }
   }
