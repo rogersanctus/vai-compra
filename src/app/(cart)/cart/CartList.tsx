@@ -72,7 +72,7 @@ export function CartList({ cart }: CartClientProps) {
           <p className="text-2xl font-semibold">
             Que tal dar uma olhada em nossos produtos?{' '}
             <a
-              className="text-lime-500 drop-shadow"
+              className="text-lime-500 underline underline-offset-4 drop-shadow"
               href="/"
               title="Página dos produtos"
             >
