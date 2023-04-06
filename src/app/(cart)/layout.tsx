@@ -13,7 +13,7 @@ export default function CartLayout({ children }: CartLayoutProps) {
   return (
     <>
       <Header />
-      <main>{children}</main>
+      <main className="flex flex-col flex-grow">{children}</main>
       <Footer />
     </>
   )
