@@ -15,15 +15,18 @@ const initialState: Cart = {
   isLoading: true
 }
 
-async function fetchCart(): Promise<Cart> {
-  const response = await clientFetch('/api/carts')
+export const fetchCart = createAsyncThunk(
+  `${SliceName}/fetchCart`,
+  async function (): Promise<CartModel> {
+    const response = await clientFetch('/api/carts')
 
-  if (!response.ok) {
-    throw new Error('Could not get the user cart')
+    if (!response.ok) {
+      throw new Error('Could not get the user cart')
+    }
+
+    return await response.json()
   }
-
-  return await response.json()
-}
+)
 
 export const updateCart = createAsyncThunk(
   `${SliceName}/updateCart`,
@@ -119,6 +122,17 @@ export const cart = createSlice({
     }
   },
   extraReducers: (builder) => {
+    builder.addCase(fetchCart.pending, (state) => {
+      state.isLoading = true
+    })
+    builder.addCase(fetchCart.fulfilled, (state, action) => {
+      state.cart = action.payload
+      state.isLoading = false
+    })
+    builder.addCase(fetchCart.rejected, (state) => {
+      state.isLoading = false
+    })
+
     builder.addCase(updateCart.pending, (state) => {
       state.isLoading = true
     })
