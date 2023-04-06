@@ -127,6 +127,24 @@ export const cart = createSlice({
         state.cart.products = copy
       }
     },
+    deleteProduct(state, action: PayloadAction<CartProduct>) {
+      const toFound = action.payload
+
+      if (!state.cart) {
+        return state
+      }
+
+      const foundIndex = state.cart.products.findIndex(
+        (product) => product.id === toFound.id
+      )
+
+      if (foundIndex !== -1) {
+        const copy = [...state.cart?.products]
+        copy.splice(foundIndex, 1)
+
+        state.cart.products = copy
+      }
+    },
     setCart(state, action: PayloadAction<CartModel>) {
       state.cart = action.payload
     },

@@ -77,6 +77,25 @@ export function CartItem({ product }: CartItemProps) {
     updateCartAbortController.current = promise.abort
   }
 
+  async function onDelete() {
+    const payload = { ...product, amount: 0, isLoading: true }
+    cartAction.updateProduct(payload)
+
+    if (updateCartAbortController.current) {
+      updateCartAbortController.current()
+      updateCartAbortController.current = null
+    }
+
+    const promise = dispatch(updateCart(payload))
+    updateCartAbortController.current = promise.abort
+
+    try {
+      await promise
+    } finally {
+      cartAction.updateProduct({ ...payload, isLoading: false })
+    }
+  }
+
   return (
     <div className="flex items-start flex-grow">
       <div className="flex flex-grow mr-8">
@@ -98,8 +117,12 @@ export function CartItem({ product }: CartItemProps) {
               {product.title}
             </a>
             <button
-              className="text-rose-400 text-sm font-bold uppercase ml-auto"
+              className={`text-rose-400 text-sm font-bold uppercase ml-auto ${
+                product.isLoading ? 'cursor-not-allowed' : ''
+              }`}
               title="Excluir produto"
+              onClick={onDelete}
+              disabled={product.isLoading}
             >
               Excluir
             </button>
