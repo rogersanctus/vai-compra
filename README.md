@@ -80,6 +80,10 @@ CRYPTO_SALT=THE_RETURN_FROM_THE_COMMAND_ABOVE
 
 > Please remmember to replace the text `THE_RETURN_FROM_THE_COMMAND_ABOVE` with the output from the openssl rand command.
 
+### A setting example:
+
+There is a .env.example file with all needed variables. If you want you can copy it with the name .env and set it.
+
 ## Finally Running the application
 
 And to run run the server run:
