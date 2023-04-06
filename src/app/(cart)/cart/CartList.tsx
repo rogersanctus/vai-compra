@@ -8,6 +8,7 @@ import { useAppSelector } from '@/stores'
 import { LoadingOverlay } from '@/components/LoadingOverlay'
 import { Button } from '@/components/Button'
 import { formatPrice } from '@/lib/number'
+import { useRouter } from 'next/navigation'
 
 interface CartClientProps {
   cart: Cart
@@ -17,6 +18,7 @@ export function CartList({ cart }: CartClientProps) {
   const { cartAction } = actions
   const [total, setTotal] = useState('')
   const localCart = useAppSelector((state) => state.cart.cart)
+  const router = useRouter()
 
   useEffect(() => {
     cartAction.setCart(cart)
@@ -35,6 +37,11 @@ export function CartList({ cart }: CartClientProps) {
     const totalFmt = formatPrice(totalPrices)
     setTotal(totalFmt)
   }, [localCart])
+
+  function onNextStep() {
+    cartAction.setIsGoingToDetails(true)
+    router.push('/checkout')
+  }
 
   if (!localCart) {
     return (
@@ -63,7 +70,7 @@ export function CartList({ cart }: CartClientProps) {
             <span className="text-2xl font-bold ml-6">{total}</span>
           </div>
           <div className="flex justify-end my-8">
-            <Button variant="success" size="lg">
+            <Button variant="success" size="lg" onClick={onNextStep}>
               Prosseguir com A compra
             </Button>
           </div>
