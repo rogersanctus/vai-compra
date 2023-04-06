@@ -73,6 +73,16 @@ export async function getCart(userId: number) {
   } as Cart
 }
 
+export async function getCartProductsCount(userId: number) {
+  return await prismaClient.cartProduct.count({
+    where: {
+      cart: {
+        user_id: userId
+      }
+    }
+  })
+}
+
 export async function updateCartProduct(
   userId: number,
   product: CartProduct,

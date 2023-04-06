@@ -8,10 +8,12 @@ const SliceName = 'cart'
 export interface Cart {
   isLoading?: boolean
   cart: CartModel | null
+  productsCount: number
 }
 
 const initialState: Cart = {
   cart: null,
+  productsCount: 0,
   isLoading: true
 }
 
@@ -22,6 +24,19 @@ export const fetchCart = createAsyncThunk(
 
     if (!response.ok) {
       throw new Error('Could not get the user cart')
+    }
+
+    return await response.json()
+  }
+)
+
+export const fetchCartProductsCount = createAsyncThunk(
+  `${SliceName}/fetchCartProductsCount`,
+  async function (): Promise<{ count: number }> {
+    const response = await clientFetch('/api/carts/products/count')
+
+    if (!response.ok) {
+      throw new Error('Could not get the quantity of products on the cart')
     }
 
     return await response.json()
@@ -130,6 +145,17 @@ export const cart = createSlice({
       state.isLoading = false
     })
     builder.addCase(fetchCart.rejected, (state) => {
+      state.isLoading = false
+    })
+
+    builder.addCase(fetchCartProductsCount.pending, (state) => {
+      state.isLoading = true
+    })
+    builder.addCase(fetchCartProductsCount.fulfilled, (state, action) => {
+      state.productsCount = action.payload.count
+      state.isLoading = false
+    })
+    builder.addCase(fetchCartProductsCount.rejected, (state) => {
       state.isLoading = false
     })
 

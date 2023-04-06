@@ -1,26 +1,16 @@
 'use client'
 
-import { CartProduct } from '@/models/cart'
-import { RootState, useAppDispatch, useAppSelector } from '@/stores'
-import { fetchCart } from '@/stores/cart'
+import { useAppDispatch, useAppSelector } from '@/stores'
+import { fetchCartProductsCount } from '@/stores/cart'
 import { ShoppingCartIcon } from '@heroicons/react/24/solid'
-import { createSelector } from '@reduxjs/toolkit'
 import { useEffect } from 'react'
-
-const itemsOnCartSelector = createSelector(
-  (state: RootState) => state.cart.cart?.products,
-  (products) => {
-    console.log('products (selector)', products)
-    return products?.length ?? 0
-  }
-)
 
 export function ShoppingCart() {
   const dispatch = useAppDispatch()
-  const itemsOnCart = useAppSelector(itemsOnCartSelector)
+  const itemsOnCart = useAppSelector((state) => state.cart.productsCount)
 
   useEffect(() => {
-    dispatch(fetchCart())
+    dispatch(fetchCartProductsCount())
   }, [dispatch])
 
   return (
