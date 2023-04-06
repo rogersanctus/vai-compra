@@ -1,12 +1,12 @@
 'use client'
 
 import { CartProduct } from '@/models/cart'
-import { useAppDispatch, useAppSelector } from '@/stores'
+import { useAppDispatch } from '@/stores'
 import { actions } from '@/stores/actions'
-import { addToCart, removeFromCart, updateCart } from '@/stores/cart'
+import { updateCart } from '@/stores/cart'
 import Image from 'next/image'
 import { NumberInput } from '@/components/NumberInput'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { formatPrice } from '@/lib/number'
 
 interface CartItemProps {
@@ -18,10 +18,18 @@ export function CartItem({ product }: CartItemProps) {
   const [totalPrice, setTotalPrice] = useState('')
   const { cartAction } = actions
   const dispatch = useAppDispatch()
+  const updateCartAbortController = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     setPrice('')
     setTotalPrice('')
+
+    return () => {
+      if (updateCartAbortController.current) {
+        updateCartAbortController.current()
+        updateCartAbortController.current = null
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -41,21 +49,32 @@ export function CartItem({ product }: CartItemProps) {
 
       try {
         cartAction.updateProduct(newProduct)
-        await dispatch(updateCart(newProduct))
+
+        if (updateCartAbortController.current) {
+          updateCartAbortController.current()
+          updateCartAbortController.current = null
+        }
+
+        const promise = dispatch(updateCart(newProduct))
+        updateCartAbortController.current = promise.abort
+        await promise
       } finally {
         cartAction.updateProduct({ ...newProduct, isLoading: false })
       }
     }
   }
 
-  const onAddToCart = function () {
-    cartAction.updateProduct({ ...product, amount: product.amount + 1 })
-    dispatch(addToCart(product))
-  }
+  function onIncreaseOrDecrease(value: number) {
+    const payload = { ...product, amount: value }
+    cartAction.updateProduct(payload)
 
-  const onRemoveFromCart = function () {
-    cartAction.updateProduct({ ...product, amount: product.amount - 1 })
-    dispatch(removeFromCart(product))
+    if (updateCartAbortController.current) {
+      updateCartAbortController.current()
+      updateCartAbortController.current = null
+    }
+
+    const promise = dispatch(updateCart(payload))
+    updateCartAbortController.current = promise.abort
   }
 
   return (
@@ -70,24 +89,31 @@ export function CartItem({ product }: CartItemProps) {
             className="object-contain"
           />
         </div>
-        <div>
-          <span className="text-lg text-gray-700 font-semibold">
+        <div className="flex-grow">
+          <div className="flex text-lg text-gray-700 font-semibold">
             <a
               href={`/product/${product.id}`}
               title="Abrir detalhes do produto"
             >
               {product.title}
             </a>
-          </span>
+            <button
+              className="text-rose-400 text-sm font-bold uppercase ml-auto"
+              title="Excluir produto"
+            >
+              Excluir
+            </button>
+          </div>
           <p className="text-gray-600 mt-4">{product.description}</p>
         </div>
       </div>
       <div className="flex-none">
         <NumberInput
           onChange={onChangeAmount}
-          onAdd={onAddToCart}
-          onRemove={onRemoveFromCart}
+          onAdd={onIncreaseOrDecrease}
+          onRemove={onIncreaseOrDecrease}
           value={product.amount}
+          min={1}
           isLoading={product.isLoading}
         />
       </div>
