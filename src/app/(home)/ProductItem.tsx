@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/Button'
 import { ProductWithFavourite } from '@/models/product'
-import { useAppSelector } from '@/stores'
+import { useAppDispatch, useAppSelector } from '@/stores'
 import {
   HeartIcon as HeartIconOutline,
   ShoppingBagIcon,
@@ -18,15 +18,17 @@ import { Favourite } from '@/models/favourite'
 import { clientFetch } from '@/lib/clientFetch'
 import Link from 'next/link'
 import { formatPrice } from '@/lib/number'
+import { addToCart } from '@/stores/cart'
 
 interface ProductProps {
   product: ProductWithFavourite
 }
 
-const { productsAction } = actions
+const { productsAction, cartAction } = actions
 
 export function ProductItem({ product }: ProductProps) {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn)
+  const dispatch = useAppDispatch()
   const [showFavourite, setShowFavourite] = useState(false)
   const [canShowFavourite, setCanShowFavourite] = useState(false)
 
@@ -91,6 +93,28 @@ export function ProductItem({ product }: ProductProps) {
     }
   }
 
+  async function onAddToCart() {
+    try {
+      productsAction.updateProductOnList({ ...product, isLoading: true })
+      await dispatch(addToCart({ ...product, amount: 1 }))
+
+      toast('Produto adicionado ao carrinho :D', {
+        type: 'success',
+        position: 'top-right'
+      })
+    } catch (error) {
+      toast(
+        'Não foi possível adicionar ao carrinho. Tente novamente mais tarde',
+        {
+          type: 'error',
+          position: 'top-right'
+        }
+      )
+    } finally {
+      productsAction.updateProductOnList({ ...product, isLoading: false })
+    }
+  }
+
   const price = formatPrice(product.price)
   return (
     <li
@@ -134,6 +158,9 @@ export function ProductItem({ product }: ProductProps) {
           className="flex justify-center w-full ml-2"
           variant="dark"
           title="Adicionar ao carrinho"
+          onClick={onAddToCart}
+          isLoading={product.isLoading}
+          disabled={product.isLoading}
         >
           <ShoppingCartIcon className="w-6 h-6" />
         </Button>
