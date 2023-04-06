@@ -21,16 +21,17 @@ export const SearchProducts = function () {
     if (isLoading) {
       return
     }
-    const searchURL = `/search?q=${encodeURI(search)}${
-      mustHaveAllTerms ? '&at=1' : ''
-    }`
+    const searchParams = new URLSearchParams()
+    searchParams.set('q', search)
+    searchParams.set('at', '1')
+    const searchURL = `/search?${searchParams.toString()}`
     router.push(searchURL)
   }
 
   useEffect(() => {
     setSearch('')
     setMustHaveAllTerms(false)
-    productsAction.reset()
+    productsAction.clearIsLoading()
   }, [])
 
   return (

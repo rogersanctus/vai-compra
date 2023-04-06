@@ -144,6 +144,9 @@ export const products = createSlice({
     setProductList(state, action: PayloadAction<ProductWithFavourite[]>) {
       state.products = action.payload
     },
+    clearIsLoading(state) {
+      state.isLoading = false
+    },
     resetProducts(state) {
       state.products = []
     },
