@@ -11,7 +11,9 @@ export default async function CartPage() {
 
     return (
       <div className="flex flex-col flex-grow px-20 py-10 relative">
-        <span className="text-3xl text-gray-600 font-bold mb-8">Carrinho</span>
+        <span className="text-3xl text-gray-600 font-bold mb-8">
+          Seu carrinho
+        </span>
         {cart ? (
           <CartList cart={cart} />
         ) : (

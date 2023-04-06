@@ -6,15 +6,28 @@ import { actions } from '@/stores/actions'
 import { addToCart, removeFromCart, updateCart } from '@/stores/cart'
 import Image from 'next/image'
 import { NumberInput } from '@/components/NumberInput'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { formatPrice } from '@/lib/number'
 
 interface CartItemProps {
   product: CartProduct
 }
 
 export function CartItem({ product }: CartItemProps) {
+  const [price, setPrice] = useState('')
+  const [totalPrice, setTotalPrice] = useState('')
   const { cartAction } = actions
   const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    setPrice('')
+    setTotalPrice('')
+  }, [])
+
+  useEffect(() => {
+    setPrice(formatPrice(product.price))
+    setTotalPrice(formatPrice(product.price * product.amount))
+  }, [product])
 
   useEffect(() => {
     cartAction.clearIsLoading()
@@ -47,7 +60,7 @@ export function CartItem({ product }: CartItemProps) {
 
   return (
     <div className="flex items-start flex-grow">
-      <div className="flex mr-8">
+      <div className="flex flex-grow mr-8">
         <div className="flex relative mr-8 min-w-[4rem]">
           <Image
             src={product.image}
@@ -69,13 +82,25 @@ export function CartItem({ product }: CartItemProps) {
           <p className="text-gray-600 mt-4">{product.description}</p>
         </div>
       </div>
-      <NumberInput
-        onChange={onChangeAmount}
-        onAdd={onAddToCart}
-        onRemove={onRemoveFromCart}
-        value={product.amount}
-        isLoading={product.isLoading}
-      />
+      <div className="flex-none">
+        <NumberInput
+          onChange={onChangeAmount}
+          onAdd={onAddToCart}
+          onRemove={onRemoveFromCart}
+          value={product.amount}
+          isLoading={product.isLoading}
+        />
+      </div>
+      <div className="flex flex-col flex-shrink justify-start min-w-[220px] h-full ml-6">
+        <div className="flex whitespace-nowrap text-base text-gray-600">
+          <span>{product.amount}x</span>
+          <span className="ml-auto">{price}</span>
+        </div>
+        <div className="flex whitespace-nowrap text-xl text-lime-600 font-semibold mt-2">
+          <span>=</span>
+          <span className="ml-auto">{totalPrice}</span>
+        </div>
+      </div>
     </div>
   )
 }

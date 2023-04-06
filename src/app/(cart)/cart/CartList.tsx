@@ -2,10 +2,12 @@
 
 import { Cart } from '@/models/cart'
 import { actions } from '@/stores/actions'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { CartItem } from './CartItem'
 import { useAppSelector } from '@/stores'
 import { LoadingOverlay } from '@/components/LoadingOverlay'
+import { Button } from '@/components/Button'
+import { formatPrice } from '@/lib/number'
 
 interface CartClientProps {
   cart: Cart
@@ -13,11 +15,26 @@ interface CartClientProps {
 
 export function CartList({ cart }: CartClientProps) {
   const { cartAction } = actions
+  const [total, setTotal] = useState('')
   const localCart = useAppSelector((state) => state.cart.cart)
 
   useEffect(() => {
     cartAction.setCart(cart)
   }, [cart, cartAction])
+
+  useEffect(() => {
+    if (!localCart) {
+      return
+    }
+
+    const totalPrices = localCart.products.reduce((accum, product) => {
+      accum += product.price * product.amount
+      return accum
+    }, 0)
+
+    const totalFmt = formatPrice(totalPrices)
+    setTotal(totalFmt)
+  }, [localCart])
 
   if (!localCart) {
     return (
@@ -39,6 +56,13 @@ export function CartList({ cart }: CartClientProps) {
           </li>
         ))}
       </ul>
+      <div className="flex mt-6 justify-end">
+        <span className="text-lg">Total:</span>
+        <span className="text-2xl font-bold ml-6">{total}</span>
+      </div>
+      <div className="flex justify-end my-8">
+        <Button>Prosseguir com A compra</Button>
+      </div>
     </div>
   )
 }
