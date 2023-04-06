@@ -1,4 +1,3 @@
-import debounce from 'lodash/debounce'
 import { Button } from './Button'
 import { Input } from './Input'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
@@ -10,16 +9,19 @@ interface NumberInputProps {
   onChange: (value: number) => void
   value: number
   isLoading?: boolean
+  min?: number
+  max?: number
 }
 
 type Timeout = ReturnType<typeof setTimeout>
 
-const DEBOUNCE_TIME = 500
 const ONCHANGE_DEBOUNCE_TIME = 1000
 
 export function NumberInput({
   value,
   isLoading = false,
+  min = 0,
+  max,
   onAdd,
   onRemove,
   onChange
@@ -32,17 +34,38 @@ export function NumberInput({
     setValue(value.toString())
   }, [value])
 
-  const onAddDebounced = debounce(() => {
-    onAdd(Number(value))
-  }, DEBOUNCE_TIME)
+  function onIncrease() {
+    const numValue = Number(localValue)
 
-  const onRemoveDebounced = debounce(() => {
-    onRemove(Number(value))
-  }, DEBOUNCE_TIME)
+    if (max && numValue >= max) {
+      return
+    }
+
+    const newValue = numValue + 1
+    setValue(newValue.toString())
+    onAdd(newValue)
+  }
+
+  function onDecrease() {
+    const numValue = Number(localValue)
+
+    if (numValue <= min) {
+      return
+    }
+
+    const newValue = numValue - 1
+    setValue(newValue.toString())
+    onRemove(newValue)
+  }
 
   function onChangeInput(event: ChangeEvent<HTMLInputElement>) {
     const newValue = event.target.value
-    setValue(newValue)
+    const numValue = Number(newValue)
+
+    const minNum = Math.max(numValue, min)
+    const adjusted = max ? Math.min(minNum, max) : minNum
+
+    setValue(adjusted.toString())
 
     lastTime.current = new Date().getTime()
 
@@ -54,7 +77,7 @@ export function NumberInput({
       const currentTime = new Date().getTime()
 
       if (currentTime - lastTime.current! >= ONCHANGE_DEBOUNCE_TIME) {
-        onChange(Number(newValue))
+        onChange(adjusted)
       }
     }, ONCHANGE_DEBOUNCE_TIME)
   }
@@ -63,10 +86,10 @@ export function NumberInput({
     <div className="flex flex-none ml-auto w-[200px] relative">
       <Button
         variant="secondary"
-        title="Remover um produto"
-        onClick={onRemoveDebounced}
+        title="Decrease"
+        onClick={onDecrease}
         className="w-12"
-        disabled={isLoading}
+        disabled={isLoading || Number(localValue) === min}
       >
         -
       </Button>
@@ -79,10 +102,10 @@ export function NumberInput({
       />
       <Button
         variant="secondary"
-        title="Adicionar um produto"
-        onClick={onAddDebounced}
+        title="Increase"
+        onClick={onIncrease}
         className="w-12"
-        disabled={isLoading}
+        disabled={isLoading || Number(localValue) === max}
       >
         +
       </Button>
