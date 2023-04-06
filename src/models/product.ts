@@ -9,6 +9,7 @@ export interface Product {
     rate: number
     count: number
   }
+  isLoading?: boolean
 }
 
 export interface ProductWithFavourite extends Product {
