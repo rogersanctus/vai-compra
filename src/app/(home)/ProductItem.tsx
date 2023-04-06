@@ -100,14 +100,14 @@ export function ProductItem({ product }: ProductProps) {
 
       toast('Produto adicionado ao carrinho :D', {
         type: 'success',
-        position: 'top-right'
+        position: 'bottom-right'
       })
     } catch (error) {
       toast(
         'Não foi possível adicionar ao carrinho. Tente novamente mais tarde',
         {
           type: 'error',
-          position: 'top-right'
+          position: 'bottom-right'
         }
       )
     } finally {
