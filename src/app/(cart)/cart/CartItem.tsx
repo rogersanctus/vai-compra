@@ -47,8 +47,8 @@ export function CartItem({ product }: CartItemProps) {
 
   return (
     <div className="flex items-start flex-grow">
-      <div className="flex">
-        <div className="flex relative mr-4 min-w-[4rem]">
+      <div className="flex mr-8">
+        <div className="flex relative mr-8 min-w-[4rem]">
           <Image
             src={product.image}
             width={64}
@@ -66,7 +66,7 @@ export function CartItem({ product }: CartItemProps) {
               {product.title}
             </a>
           </span>
-          <p className="text-gray-600">{product.description}</p>
+          <p className="text-gray-600 mt-4">{product.description}</p>
         </div>
       </div>
       <NumberInput
