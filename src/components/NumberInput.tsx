@@ -74,7 +74,7 @@ export function NumberInput({
         type="text"
         value={localValue}
         onChange={onChangeInput}
-        className="mx-1 text-center"
+        className="mx-1 text-center max-w-[100px]"
         disabled={isLoading}
       />
       <Button
