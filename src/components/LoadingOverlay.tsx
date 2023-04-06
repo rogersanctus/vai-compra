@@ -19,7 +19,7 @@ export function LoadingOverlay({ isLoading = false }: LoadingOverlayProps) {
   }
 
   return (
-    <div className="absolute left-0 right-0 w-full h-full flex items-center justify-center bg-black/10">
+    <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black/10">
       <SyncLoader color={color ? color['500'] : 'blue'} />
     </div>
   )
