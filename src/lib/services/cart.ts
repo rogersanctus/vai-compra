@@ -129,7 +129,7 @@ export async function updateCartProduct(
     if (getNewAmount && typeof getNewAmount === 'function') {
       const newAmount = getNewAmount(existingProduct)
 
-      if (newAmount) {
+      if (newAmount !== undefined) {
         amount = newAmount
       }
     } else {
