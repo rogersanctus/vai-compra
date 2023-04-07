@@ -24,7 +24,7 @@ interface ProductProps {
   product: ProductWithFavourite
 }
 
-const { productsAction, cartAction } = actions
+const { productsAction } = actions
 
 export function ProductItem({ product }: ProductProps) {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn)
@@ -94,26 +94,26 @@ export function ProductItem({ product }: ProductProps) {
   }
 
   async function onAddToCart() {
-    try {
-      productsAction.updateProductOnList({ ...product, isLoading: true })
-      await dispatch(addToCart({ ...product, amount: 1 }))
+    productsAction.updateProductOnList({ ...product, isLoading: true })
+    const resultAction = await dispatch(addToCart({ ...product, amount: 1 }))
+    dispatch(fetchCartProductsCount())
 
+    if (addToCart.fulfilled.match(resultAction)) {
       toast('Produto adicionado ao carrinho :D', {
         type: 'success',
         position: 'bottom-right'
       })
-    } catch (error) {
-      toast(
-        'Não foi possível adicionar ao carrinho. Tente novamente mais tarde',
-        {
-          type: 'error',
-          position: 'bottom-right'
-        }
-      )
-    } finally {
-      dispatch(fetchCartProductsCount())
-      productsAction.updateProductOnList({ ...product, isLoading: false })
+    } else {
+      const message =
+        'Não foi possível adicionar ao carrinho. Tente novamente mais tarde'
+
+      toast(message, {
+        type: 'error',
+        position: 'bottom-right'
+      })
     }
+
+    productsAction.updateProductOnList({ ...product, isLoading: false })
   }
 
   const price = formatPrice(product.price)

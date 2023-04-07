@@ -17,15 +17,15 @@ export function ProductDetailsActions({ product }: ProductDetailsActionsProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   async function onAddToCart() {
-    try {
-      setIsLoading(true)
-      await dispatch(addToCart({ ...product, amount: 1 }))
+    setIsLoading(true)
+    const addToCartResult = await dispatch(addToCart({ ...product, amount: 1 }))
 
+    if (addToCart.fulfilled.match(addToCartResult)) {
       toast('Produto adicionado ao carrinho :D', {
         type: 'success',
         position: 'bottom-right'
       })
-    } catch (error) {
+    } else {
       toast(
         'Não foi possível adicionar ao carrinho. Tente novamente mais tarde',
         {
@@ -33,10 +33,10 @@ export function ProductDetailsActions({ product }: ProductDetailsActionsProps) {
           position: 'bottom-right'
         }
       )
-    } finally {
-      dispatch(fetchCartProductsCount())
-      setIsLoading(false)
     }
+
+    dispatch(fetchCartProductsCount())
+    setIsLoading(false)
   }
 
   return (
