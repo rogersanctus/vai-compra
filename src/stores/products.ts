@@ -8,6 +8,7 @@ const SliceName = 'products'
 
 export interface Products {
   isLoading?: boolean
+  isSearching?: boolean
   products: ProductWithFavourite[]
   product: ProductWithFavourite | null
   searchingTerms: string | null
@@ -15,6 +16,7 @@ export interface Products {
 
 const initialState: Products = {
   isLoading: true,
+  isSearching: false,
   products: [],
   product: null,
   searchingTerms: null
@@ -95,9 +97,11 @@ export const searchProducts = createAsyncThunk(
     }
 
     async function fetchProducts(): Promise<Product[]> {
-      const queryStr = encodeURI(
-        `/api/products?search=${search}&all-terms=${mustHaveAllTerms}`
-      )
+      const searchParams = new URLSearchParams()
+      searchParams.set('search', search)
+      searchParams.set('all-terms', String(mustHaveAllTerms))
+
+      const queryStr = `/api/products?${searchParams.toString()}`
       const response = await clientFetch(queryStr, {
         signal: thunkApi.signal
       })
@@ -155,6 +159,9 @@ export const products = createSlice({
     setProductList(state, action: PayloadAction<ProductWithFavourite[]>) {
       state.products = action.payload
     },
+    setIsLoading(state, action: PayloadAction<boolean>) {
+      state.isLoading = action.payload
+    },
     clearIsLoading(state) {
       state.isLoading = false
     },
@@ -189,14 +196,14 @@ export const products = createSlice({
     })
 
     builder.addCase(searchProducts.pending, (state) => {
-      state.isLoading = true
+      state.isSearching = true
     })
     builder.addCase(searchProducts.fulfilled, (state, action) => {
       state.products = action.payload
-      state.isLoading = false
+      state.isSearching = false
     })
     builder.addCase(searchProducts.rejected, (state) => {
-      state.isLoading = false
+      state.isSearching = false
     })
   }
 })
