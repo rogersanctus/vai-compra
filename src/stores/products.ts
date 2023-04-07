@@ -21,9 +21,11 @@ const initialState: Products = {
 }
 
 // This fetch must always return a list. Do not rethrow anything
-async function fetchFavourites(): Promise<Favourite[]> {
+async function fetchFavourites(abortSignal: AbortSignal): Promise<Favourite[]> {
   try {
-    const response = await clientFetch('/api/users/favourites')
+    const response = await clientFetch('/api/users/favourites', {
+      signal: abortSignal
+    })
 
     if (!response.ok) {
       throw new Error('Could not get the favourites list')
@@ -36,8 +38,10 @@ async function fetchFavourites(): Promise<Favourite[]> {
   }
 }
 
-async function fetchAllProducts(): Promise<Product[]> {
-  const response = await clientFetch('/api/products')
+async function fetchAllProducts(abortSignal: AbortSignal): Promise<Product[]> {
+  const response = await clientFetch('/api/products', {
+    signal: abortSignal
+  })
 
   if (!response.ok) {
     throw new Error('Could not get product list')
@@ -55,8 +59,10 @@ async function fetchAllProducts(): Promise<Product[]> {
 
 export const fetchProduct = createAsyncThunk(
   `${SliceName}/fetchProduct`,
-  async (productId: number) => {
-    const response = await clientFetch(`/api/products/${productId}`)
+  async (productId: number, thunkApi) => {
+    const response = await clientFetch(`/api/products/${productId}`, {
+      signal: thunkApi.signal
+    })
 
     if (!response.ok) {
       throw new Error('Could not get product list')
@@ -69,27 +75,32 @@ export const fetchProduct = createAsyncThunk(
 
 export const fetchProducts = createAsyncThunk(
   `${SliceName}/fetchProducts`,
-  fetchAllProducts
+  (_, thunkApi) => fetchAllProducts(thunkApi.signal)
 )
 
 export const searchProducts = createAsyncThunk(
   `${SliceName}/searchProducts`,
-  async ({
-    search,
-    mustHaveAllTerms
-  }: {
-    search: string
-    mustHaveAllTerms: boolean
-  }): Promise<ProductWithFavourite[]> => {
+  async (
+    {
+      search,
+      mustHaveAllTerms
+    }: {
+      search: string
+      mustHaveAllTerms: boolean
+    },
+    thunkApi
+  ): Promise<ProductWithFavourite[]> => {
     if (!search || search.trim().length === 0) {
-      return fetchAllProducts()
+      return fetchAllProducts(thunkApi.signal)
     }
 
     async function fetchProducts(): Promise<Product[]> {
       const queryStr = encodeURI(
         `/api/products?search=${search}&all-terms=${mustHaveAllTerms}`
       )
-      const response = await clientFetch(queryStr)
+      const response = await clientFetch(queryStr, {
+        signal: thunkApi.signal
+      })
 
       if (!response.ok) {
         throw new Error('Could not search for products')
@@ -100,7 +111,7 @@ export const searchProducts = createAsyncThunk(
     }
 
     const [favourites, products] = await Promise.all([
-      fetchFavourites(),
+      fetchFavourites(thunkApi.signal),
       fetchProducts()
     ])
 

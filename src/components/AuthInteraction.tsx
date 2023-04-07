@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { UserCircleIcon } from '@heroicons/react/20/solid'
 import { useAppDispatch, useAppSelector } from '@/stores'
 import { actions } from '@/stores/actions'
@@ -13,6 +13,8 @@ const { authAction } = actions
 export function AuthInteraction() {
   const auth = useAppSelector((state) => state.auth)
   const router = useRouter()
+  const fetchIsLoggedInAbort = useRef<(() => void) | null>(null)
+  const fetchClarifyAbort = useRef<(() => void) | null>(null)
 
   const dispatch = useAppDispatch()
 
@@ -22,7 +24,20 @@ export function AuthInteraction() {
 
   useEffect(() => {
     if (auth.needToFetchIsLoggedIn) {
-      dispatch(fetchIsLoggedIn())
+      if (fetchIsLoggedInAbort.current) {
+        fetchIsLoggedInAbort.current()
+        fetchIsLoggedInAbort.current = null
+      }
+
+      const dispatchPromise = dispatch(fetchIsLoggedIn())
+      fetchIsLoggedInAbort.current = dispatchPromise.abort
+    }
+
+    return () => {
+      if (fetchIsLoggedInAbort.current) {
+        fetchIsLoggedInAbort.current()
+        fetchIsLoggedInAbort.current = null
+      }
     }
   }, [auth.needToFetchIsLoggedIn, dispatch])
 
@@ -34,7 +49,20 @@ export function AuthInteraction() {
 
   useEffect(() => {
     if (auth.needToFetchUser) {
-      dispatch(fetchClarify())
+      if (fetchClarifyAbort.current) {
+        fetchClarifyAbort.current()
+        fetchClarifyAbort.current = null
+      }
+
+      const dispatchPromise = dispatch(fetchClarify())
+      fetchClarifyAbort.current = dispatchPromise.abort
+    }
+
+    return () => {
+      if (fetchClarifyAbort.current) {
+        fetchClarifyAbort.current()
+        fetchClarifyAbort.current = null
+      }
     }
   }, [auth.needToFetchUser, dispatch])
 

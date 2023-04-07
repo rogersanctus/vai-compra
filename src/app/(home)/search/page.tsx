@@ -3,7 +3,7 @@
 import { useAppDispatch, useAppSelector } from '@/stores'
 import { ProductItem } from '../ProductItem'
 import { useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { searchProducts } from '@/stores/products'
 import { LoadingOverlay } from '@/components/LoadingOverlay'
 
@@ -14,12 +14,28 @@ export default function SearchPage() {
   const dispatch = useAppDispatch()
   const products = useAppSelector((state) => state.products.products)
   const isLoading = useAppSelector((state) => state.products.isLoading)
+  const searchProductAbort = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     const search = searchParam ?? ''
     const mustHaveAllTerms = mustHaveAllTermsParam === '1'
 
-    dispatch(searchProducts({ search, mustHaveAllTerms }))
+    if (searchProductAbort.current) {
+      searchProductAbort.current()
+      searchProductAbort.current = null
+    }
+
+    const dispatchPromise = dispatch(
+      searchProducts({ search, mustHaveAllTerms })
+    )
+    searchProductAbort.current = dispatchPromise.abort
+
+    return () => {
+      if (searchProductAbort.current) {
+        searchProductAbort.current()
+        searchProductAbort.current = null
+      }
+    }
   }, [searchParam, dispatch, mustHaveAllTermsParam])
 
   if (isLoading) {

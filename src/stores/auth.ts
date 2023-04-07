@@ -22,8 +22,10 @@ const initialState: Auth = {
 
 export const fetchIsLoggedIn = createAsyncThunk(
   `${SliceName}/fetchIsLoggedIn`,
-  async () => {
-    const resHasSession = await clientFetch('/api/auth/has-session')
+  async (_, thunkApi) => {
+    const resHasSession = await clientFetch('/api/auth/has-session', {
+      signal: thunkApi.signal
+    })
 
     if (!resHasSession.ok) {
       throw new Error('Could not get information about the auth session')
@@ -36,9 +38,11 @@ export const fetchIsLoggedIn = createAsyncThunk(
 
 export const fetchClarify = createAsyncThunk(
   `${SliceName}/fetchClarify`,
-  async () => {
+  async (_, thunkApi) => {
     try {
-      const res = await clientFetch('/api/auth/clarify')
+      const res = await clientFetch('/api/auth/clarify', {
+        signal: thunkApi.signal
+      })
 
       if (!res.ok) {
         throw new Error('Não autenticado')
