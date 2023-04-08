@@ -116,8 +116,8 @@ export function AuthInteraction() {
     >
       {auth.isLoading ? (
         <>
-          <div className="bg-white/70 rounded-full w-8 h-8"></div>
-          <div className="mt-2 bg-white/70 rounded w-20 h-4"></div>
+          <div className="bg-white/70 rounded-full w-8 h-8 blur"></div>
+          <div className="mt-2 bg-white/70 rounded w-20 h-4 blur"></div>
         </>
       ) : (
         <>
