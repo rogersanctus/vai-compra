@@ -35,5 +35,10 @@ export async function mapProductsWithFavourites<T>(
     return productsMapper(products, favourites)
   }
 
-  return []
+  throw new Error(
+    'mapProductsWithFavourites expected the requests for favourites and products to return arrays. Instead the result was: Favourite = ' +
+      JSON.stringify(favourites) +
+      ' and Products = ' +
+      JSON.stringify(products)
+  )
 }
