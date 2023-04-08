@@ -12,11 +12,13 @@ export interface Products {
   products: ProductWithFavourite[]
   product: ProductWithFavourite | null
   searchingTerms: string | null
+  pendingSearch: number
 }
 
 const initialState: Products = {
   isLoading: true,
   isSearching: false,
+  pendingSearch: 0,
   products: [],
   product: null,
   searchingTerms: null
@@ -162,6 +164,9 @@ export const products = createSlice({
     setIsLoading(state, action: PayloadAction<boolean>) {
       state.isLoading = action.payload
     },
+    setIsSearching(state, action: PayloadAction<boolean>) {
+      state.isSearching = action.payload
+    },
     clearIsLoading(state) {
       state.isLoading = false
     },
@@ -197,13 +202,22 @@ export const products = createSlice({
 
     builder.addCase(searchProducts.pending, (state) => {
       state.isSearching = true
+      state.pendingSearch++
     })
     builder.addCase(searchProducts.fulfilled, (state, action) => {
       state.products = action.payload
-      state.isSearching = false
+      state.pendingSearch--
+
+      if (state.pendingSearch === 0) {
+        state.isSearching = false
+      }
     })
-    builder.addCase(searchProducts.rejected, (state) => {
-      state.isSearching = false
+    builder.addCase(searchProducts.rejected, (state, action) => {
+      state.pendingSearch--
+
+      if (state.pendingSearch === 0) {
+        state.isSearching = false
+      }
     })
   }
 })
