@@ -5,6 +5,7 @@ import { ProductsListServer } from '../ProductsListServer'
 import { getProductsByCategory } from '@/lib/services/products'
 import { cookies } from 'next/headers'
 import { mapProductsWithFavourites } from '../favourites'
+import { FetchingError } from '../FetchingError'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,18 +29,21 @@ export default async function Categories({
 
   try {
     const cookiesList = cookies()
+
     products = await mapProductsWithFavourites<string>(
       cookiesList,
       getProductsByCategory,
       name
     )
+
+    return (
+      <div>
+        <ProductsListServer products={products} category={categoryName} />
+      </div>
+    )
   } catch (error) {
     console.info(error)
-  }
 
-  return (
-    <div>
-      <ProductsListServer products={products} category={categoryName} />
-    </div>
-  )
+    return <FetchingError categoryName={categoryName} />
+  }
 }

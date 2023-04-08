@@ -3,6 +3,7 @@ import { ProductsList } from './ProducstList'
 import { getAllProducts } from '@/lib/services/products'
 import { cookies } from 'next/headers'
 import { mapProductsWithFavourites } from './favourites'
+import { FetchingError } from './FetchingError'
 
 interface ProductListProps {
   category?: string
@@ -17,22 +18,19 @@ export const ProductsListServer = async function ({
   category,
   products
 }: ProductListProps) {
-  let localProducts: ProductWithFavourite[] = []
-
   if (products) {
-    localProducts = products
+    return <ProductsList products={products} category={category} />
   } else {
     const cookiesList = cookies()
 
     try {
-      localProducts = await mapProductsWithFavourites(
-        cookiesList,
-        fetchProducts
-      )
+      const localProducts: ProductWithFavourite[] =
+        await mapProductsWithFavourites(cookiesList, fetchProducts)
+
+      return <ProductsList products={localProducts} category={category} />
     } catch (error) {
       console.info(error)
+      return <FetchingError />
     }
   }
-
-  return <ProductsList products={localProducts} category={category} />
 } as unknown as (props: ProductListProps) => JSX.Element
