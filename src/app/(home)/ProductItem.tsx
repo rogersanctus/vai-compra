@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/Button'
 import { ProductWithFavourite } from '@/models/product'
-import { store, useAppDispatch, useAppSelector } from '@/stores'
+import { store, useAppDispatch } from '@/stores'
 import {
   HeartIcon as HeartIconOutline,
   ShoppingBagIcon,
@@ -135,6 +135,8 @@ export function ProductItem({ product }: ProductProps) {
           className="object-contain mix-blend-multiply"
           fill
           sizes="800px"
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAoSURBVBhXY+jf9al51b2CSfuAJJDNAOdASAYghYww+LMOIPTPOvAJAHyKL9xhydx5AAAAAElFTkSuQmCC"
         />
       </div>
       <Link href={productUrl()}>
