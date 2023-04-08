@@ -27,7 +27,7 @@ export default async function CartPage() {
     )
   } catch (error) {
     return (
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center p-20">
         <span className="text-3xl text-gray-600 font-bold">
           Não foi possível obter seu carrinho
         </span>
