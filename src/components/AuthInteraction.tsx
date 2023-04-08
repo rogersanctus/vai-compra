@@ -1,12 +1,11 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
-import { UserCircleIcon } from '@heroicons/react/20/solid'
+import { useEffect, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from '@/stores'
 import { actions } from '@/stores/actions'
 import { fetchClarify, fetchIsLoggedIn } from '@/stores/auth'
 import { useRouter } from 'next/navigation'
-import { clientFetch } from '@/lib/clientFetch'
+import { AuthUserInfo } from './AuthUserInfo'
 
 const { authAction } = actions
 
@@ -70,49 +69,6 @@ export function AuthInteraction() {
     }
   }, [auth.needToFetchUser, dispatch])
 
-  const UserInfo = useCallback(() => {
-    async function onLogout() {
-      try {
-        await clientFetch('/api/auth/login', { method: 'DELETE' })
-
-        authAction.reset()
-        authAction.clearSession()
-        router.push('/')
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    if (auth.isLoggedIn) {
-      return (
-        <>
-          <span className="text-white text-sm">{auth.user?.email}</span>
-          <div className="whitespace-nowrap text-purple-100 font-semibold text-xs">
-            <button
-              onClick={onLogout}
-              aria-label="Fazer logout (sair)"
-              title="Fazer logout (sair)"
-            >
-              Sair
-            </button>
-          </div>
-        </>
-      )
-    }
-
-    return (
-      <div className="whitespace-nowrap text-purple-100 font-semibold text-xs">
-        <a href="/login" title="Fazer Login" className="mr-1">
-          Login
-        </a>
-        /
-        <a href="/signup" title="Cadastrar" className="ml-1">
-          Cadastrar
-        </a>
-      </div>
-    )
-  }, [auth.isLoggedIn, auth.user, router])
-
   return (
     <div
       title={auth.isLoggedIn ? '' : 'Fazer login ou cadastrar'}
@@ -124,13 +80,7 @@ export function AuthInteraction() {
           <div className="mt-2 bg-white/70 rounded w-20 h-4 blur"></div>
         </>
       ) : (
-        <>
-          <UserCircleIcon
-            className="text-white w-8 h-8"
-            title={auth.isLoggedIn ? auth.user?.name : ''}
-          />
-          <UserInfo />
-        </>
+        <AuthUserInfo />
       )}
     </div>
   )
