@@ -6,6 +6,6 @@ interface CookieOption {
 
 export const sessionOptions: CookieOption = {
   secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
   httpOnly: true
 }
