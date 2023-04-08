@@ -13,17 +13,22 @@ export const SearchProducts = function () {
   const [search, setSearch] = useState('')
   const [mustHaveAllTerms, setMustHaveAllTerms] = useState(false)
 
-  const isLoading = useAppSelector((state) => state.products.isLoading)
+  const isSearching = useAppSelector((state) => state.products.isSearching)
 
   const router = useRouter()
 
   async function onSearch() {
-    if (isLoading) {
+    if (isSearching) {
       return
     }
+
     const searchParams = new URLSearchParams()
     searchParams.set('q', search)
-    searchParams.set('at', '1')
+
+    if (mustHaveAllTerms) {
+      searchParams.set('at', '1')
+    }
+
     const searchURL = `/search?${searchParams.toString()}`
     router.push(searchURL)
   }
@@ -49,8 +54,8 @@ export const SearchProducts = function () {
           className="ml-2"
           variant="secondary"
           size="md"
-          isLoading={isLoading}
-          disabled={isLoading}
+          isLoading={isSearching}
+          disabled={isSearching}
           onClick={onSearch}
         >
           Buscar
