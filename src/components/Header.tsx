@@ -28,7 +28,6 @@ export function Header({ prepend, append, isAuthPage = false }: HeaderProps) {
         {isAuthPage ? null : <AuthInteraction />}
         {append}
       </div>
-      <div className="absolute bottom-0 left-0 w-full h-[2px] bg-purple-800"></div>
     </header>
   )
 }
