@@ -10,6 +10,7 @@ export interface Auth {
   user: AuthUser | null
   needToFetchIsLoggedIn?: boolean
   needToFetchUser?: boolean
+  pendingRequests: number
 }
 
 const initialState: Auth = {
@@ -17,7 +18,13 @@ const initialState: Auth = {
   isLoggedIn: false,
   user: null,
   needToFetchIsLoggedIn: false,
-  needToFetchUser: false
+  needToFetchUser: false,
+  pendingRequests: 0
+}
+
+function clearSession() {
+  sessionStorage.removeItem('isLoggedIn')
+  sessionStorage.removeItem('user')
 }
 
 export const fetchIsLoggedIn = createAsyncThunk(
@@ -64,8 +71,15 @@ export const auth = createSlice({
   initialState,
   reducers: {
     loadIsLoggedIn: (state) => {
-      if (sessionStorage.getItem('isLoggedIn') === 'true') {
-        state.isLoggedIn = true
+      const isLoggedInStored = sessionStorage.getItem('isLoggedIn')
+
+      if (isLoggedInStored) {
+        state.isLoggedIn = isLoggedInStored === 'true'
+
+        if (!state.isLoggedIn) {
+          state.isLoading = false
+          state.pendingRequests = 0
+        }
       } else {
         state.needToFetchIsLoggedIn = true
       }
@@ -73,19 +87,20 @@ export const auth = createSlice({
     loadUser: (state) => {
       const userVal = sessionStorage.getItem('user')
 
-      if (userVal) {
-        try {
-          const user: AuthUser = JSON.parse(userVal)
-          state.user = user
-        } catch (error) {
-          console.error('Could not parse user from the "sessionStorage"')
-          sessionStorage.removeItem('user')
-          state.needToFetchUser = true
+      try {
+        if (!userVal) {
+          throw { info: 'no user info at sessionStorage' }
         }
-      } else {
+
+        const user: AuthUser = JSON.parse(userVal)
+        state.user = user
+        state.isLoading = false
+        state.pendingRequests = 0
+      } catch (error) {
+        console.info('Could not parse user from the "sessionStorage"')
+        sessionStorage.removeItem('user')
         state.needToFetchUser = true
       }
-      state.isLoading = false
     },
     setIsLoggedIn: (state, action: PayloadAction<boolean>) => {
       state.isLoggedIn = action.payload
@@ -98,27 +113,41 @@ export const auth = createSlice({
       return { ...initialState, isLoading: false }
     },
     clearSession: (state) => {
-      sessionStorage.removeItem('isLoggedIn')
-      sessionStorage.removeItem('user')
+      clearSession()
+    },
+    clearIsLoading(state) {
+      state.isLoading = false
+      state.pendingRequests = 0
     }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchIsLoggedIn.pending, (state) => {
       state.isLoading = true
+      state.pendingRequests++
     })
     builder.addCase(fetchIsLoggedIn.fulfilled, (state, action) => {
       state.isLoggedIn = action.payload
       sessionStorage.setItem('isLoggedIn', String(action.payload))
-      state.isLoading = false
       state.needToFetchIsLoggedIn = false
+
+      if (--state.pendingRequests === 0) {
+        state.isLoading = false
+      }
     })
-    builder.addCase(fetchIsLoggedIn.rejected, (state) => {
-      state.isLoggedIn = false
-      state.isLoading = false
+    builder.addCase(fetchIsLoggedIn.rejected, (state, action) => {
+      if (!action.meta.aborted) {
+        state.isLoggedIn = false
+        sessionStorage.setItem('isLoggedIn', 'false')
+      }
+
+      if (--state.pendingRequests === 0) {
+        state.isLoading = false
+      }
     })
 
     builder.addCase(fetchClarify.pending, (state) => {
       state.isLoading = true
+      state.pendingRequests++
     })
     builder.addCase(fetchClarify.fulfilled, (state, action) => {
       const user: AuthUser | null = action.payload ?? null
@@ -129,12 +158,20 @@ export const auth = createSlice({
 
       state.user = user
 
-      state.isLoading = false
+      if (--state.pendingRequests === 0) {
+        state.isLoading = false
+      }
     })
-    builder.addCase(fetchClarify.rejected, (state) => {
-      state.isLoggedIn = false
-      state.user = null
-      state.isLoading = false
+    builder.addCase(fetchClarify.rejected, (state, action) => {
+      if (!action.meta.aborted) {
+        state.isLoggedIn = false
+        state.user = null
+        clearSession()
+      }
+
+      if (--state.pendingRequests === 0) {
+        state.isLoading = false
+      }
     })
   }
 })
