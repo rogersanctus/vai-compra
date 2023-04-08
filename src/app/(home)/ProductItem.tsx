@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/Button'
 import { ProductWithFavourite } from '@/models/product'
-import { useAppDispatch, useAppSelector } from '@/stores'
+import { store, useAppDispatch, useAppSelector } from '@/stores'
 import {
   HeartIcon as HeartIconOutline,
   ShoppingBagIcon,
@@ -27,20 +27,26 @@ interface ProductProps {
 const { productsAction } = actions
 
 export function ProductItem({ product }: ProductProps) {
-  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn)
   const dispatch = useAppDispatch()
   const [showFavourite, setShowFavourite] = useState(false)
   const [canShowFavourite, setCanShowFavourite] = useState(false)
+  const price = formatPrice(product.price)
 
   useEffect(() => {
     setShowFavourite(false)
     setCanShowFavourite(false)
-    //productsAction.resetProducts()
   }, [])
 
-  useEffect(() => {
-    setCanShowFavourite(isLoggedIn)
-  }, [isLoggedIn])
+  // The listener callback passed to .subscribe function will be called
+  // for any change in the whole store. And that's why we check for the
+  // specific change we have interest on.
+  store.subscribe(() => {
+    const state = store.getState()
+
+    if (state.auth.isLoggedIn !== canShowFavourite) {
+      setCanShowFavourite(state.auth.isLoggedIn)
+    }
+  })
 
   function onHover() {
     setShowFavourite(true)
@@ -116,7 +122,6 @@ export function ProductItem({ product }: ProductProps) {
     productsAction.updateProductOnList({ ...product, isLoading: false })
   }
 
-  const price = formatPrice(product.price)
   return (
     <li
       className="flex flex-col rounded shadow-lg border border-gray-200 p-4 h-[430px] justify-stretch relative"
