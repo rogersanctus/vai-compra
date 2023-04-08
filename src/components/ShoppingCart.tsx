@@ -3,14 +3,26 @@
 import { useAppDispatch, useAppSelector } from '@/stores'
 import { fetchCartProductsCount } from '@/stores/cart'
 import { ShoppingCartIcon } from '@heroicons/react/24/solid'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 export function ShoppingCart() {
   const dispatch = useAppDispatch()
   const itemsOnCart = useAppSelector((state) => state.cart.productsCount)
+  const fetchCartProductsCountAbort = useRef<(() => void) | null>(null)
 
   useEffect(() => {
-    dispatch(fetchCartProductsCount())
+    function abortFetchCartProductsCount() {
+      if (fetchCartProductsCountAbort.current) {
+        fetchCartProductsCountAbort.current()
+        fetchCartProductsCountAbort.current = null
+      }
+    }
+
+    abortFetchCartProductsCount()
+    const dispatchPromise = dispatch(fetchCartProductsCount())
+    fetchCartProductsCountAbort.current = dispatchPromise.abort
+
+    return abortFetchCartProductsCount
   }, [dispatch])
 
   return (
