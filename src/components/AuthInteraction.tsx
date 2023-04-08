@@ -20,6 +20,10 @@ export function AuthInteraction() {
 
   useEffect(() => {
     authAction.loadIsLoggedIn()
+
+    return () => {
+      authAction.clearIsLoading()
+    }
   }, [])
 
   useEffect(() => {
