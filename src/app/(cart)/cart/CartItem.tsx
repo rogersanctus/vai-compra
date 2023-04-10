@@ -6,7 +6,7 @@ import { actions } from '@/stores/actions'
 import { updateCart } from '@/stores/cart'
 import Image from 'next/image'
 import { NumberInput } from '@/components/NumberInput'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { formatPrice } from '@/lib/number'
 
 interface CartItemProps {
@@ -14,16 +14,13 @@ interface CartItemProps {
 }
 
 export function CartItem({ product }: CartItemProps) {
-  const [price, setPrice] = useState('')
-  const [totalPrice, setTotalPrice] = useState('')
+  const price = formatPrice(product.price)
+  const totalPrice = formatPrice(product.price * product.amount)
   const { cartAction } = actions
   const dispatch = useAppDispatch()
   const updateCartAbortController = useRef<(() => void) | null>(null)
 
   useEffect(() => {
-    setPrice('')
-    setTotalPrice('')
-
     return () => {
       if (updateCartAbortController.current) {
         updateCartAbortController.current()
@@ -31,11 +28,6 @@ export function CartItem({ product }: CartItemProps) {
       }
     }
   }, [])
-
-  useEffect(() => {
-    setPrice(formatPrice(product.price))
-    setTotalPrice(formatPrice(product.price * product.amount))
-  }, [product])
 
   useEffect(() => {
     cartAction.clearIsLoading()
