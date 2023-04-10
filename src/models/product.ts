@@ -15,3 +15,9 @@ export interface Product {
 export interface ProductWithFavourite extends Product {
   is_favourite?: boolean
 }
+
+export interface PurchaseProduct extends Product {
+  is_billed: boolean
+  is_missing: boolean
+  amount: number
+}
