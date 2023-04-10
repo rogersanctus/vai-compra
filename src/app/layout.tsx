@@ -1,6 +1,7 @@
 import { ReduxClientProvider } from './ReduxClientProvider'
 import './globals.css'
 import 'react-toastify/dist/ReactToastify.css'
+import { registerCleanup } from '@/lib/cleanup'
 
 export const metadata = {
   title: 'Vai! Compra',
@@ -10,6 +11,8 @@ export const metadata = {
 interface RootLayoutProps {
   children: React.ReactNode
 }
+
+registerCleanup()
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
