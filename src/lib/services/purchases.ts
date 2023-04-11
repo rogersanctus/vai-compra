@@ -1,4 +1,4 @@
-import { Product } from '@/models/product'
+import { PurchaseProduct } from '@/models/product'
 import { prismaClient } from '../prisma'
 import { getProduct } from './products'
 import { CartProduct } from '@/models/cart'
@@ -78,7 +78,9 @@ export async function createPurchaseFromProductsList(
   })
 }
 
-export async function getPurchase(purchase_id: number) {
+export async function getPurchase(
+  purchase_id: number
+): Promise<{ products: PurchaseProduct[] } | null> {
   await connect()
 
   const existingPurchase = await redis.get(`purchase:${purchase_id}`)
@@ -137,6 +139,7 @@ export async function getPurchase(purchase_id: number) {
 
 export async function getPurchases(userId: number) {
   connect()
+
   const purchases = await prismaClient.userPurchase.findMany({
     where: {
       user_id: userId
