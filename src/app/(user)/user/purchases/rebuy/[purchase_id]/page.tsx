@@ -1,4 +1,5 @@
 import { getPurchase } from '@/lib/services/purchases'
+import { PurchaseItem } from './PurchaseItem'
 
 interface RebuyPurchasePageProps {
   params: { purchase_id: string }
@@ -15,5 +16,12 @@ export default async function RebuyPurchasePage({
 
   const purchase = await getPurchase(purchaseId)
 
-  return <div>Aha!</div>
+  return (
+    <section>
+      <h1 className="text-2xl font-bold text-gray-500 mb-2 border-b-2 border-zinc-300 pb-2">
+        Recomprar Produtos
+      </h1>
+      <PurchaseItem purchase={purchase} />
+    </section>
+  )
 }
