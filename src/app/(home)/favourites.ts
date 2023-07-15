@@ -4,7 +4,7 @@ import { getFavourites } from '@/lib/services/favourites'
 import { Favourite } from '@/models/favourite'
 import { Product } from '@/models/product'
 import { RequestCookies } from 'next/dist/compiled/@edge-runtime/cookies'
-import { ReadonlyRequestCookies } from 'next/dist/server/app-render'
+import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies'
 
 // This fetch must always return a list. Do not rethrow anything
 export async function fetchFavourites(
