@@ -9,6 +9,12 @@ export class UserLoginError extends Error {
   }
 }
 
+export class UserNotAuthenticatedError extends Error {
+  constructor(message: string) {
+    super('User Not Authenticated', { cause: message })
+  }
+}
+
 export function getLoginErrorMessage(
   reason: keyof typeof LoginErrorReasons | undefined
 ) {

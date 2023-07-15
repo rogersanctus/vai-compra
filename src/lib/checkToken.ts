@@ -1,10 +1,11 @@
 import { InvalidTokenError } from '@/lib/errors/InvalidTokenError'
 import { MissingEnvVariableError } from '@/lib/errors/MissingEnvVariableError'
 import { SignJWT, importPKCS8, importSPKI, jwtVerify } from 'jose'
+import { MissingAuthSessionError } from './errors/MissingAuthSessionError'
 
 export async function checkToken(token: string | undefined) {
   if (!token) {
-    throw new Error('Auth session is missing')
+    throw new MissingAuthSessionError()
   }
 
   if (!process.env.JWT_PUB_KEY) {
@@ -27,7 +28,7 @@ export async function checkToken(token: string | undefined) {
 
 export async function getUserIdFromSession(token: string | undefined) {
   if (!token) {
-    throw new Error('Auth session is missing')
+    throw new MissingAuthSessionError()
   }
 
   if (!process.env.JWT_PUB_KEY) {
