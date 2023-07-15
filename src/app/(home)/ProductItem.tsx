@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/Button'
 import { ProductWithFavourite } from '@/models/product'
-import { store, useAppDispatch } from '@/stores'
+import { store, useAppDispatch, useAppSelector } from '@/stores'
 import {
   HeartIcon as HeartIconOutline,
   ShoppingBagIcon,
@@ -28,6 +28,7 @@ const { productsAction } = actions
 
 export function ProductItem({ product }: ProductProps) {
   const dispatch = useAppDispatch()
+  const isUserLoggedIn = useAppSelector((state) => state.auth.isLoggedIn)
   const [showFavourite, setShowFavourite] = useState(false)
   const [canShowFavourite, setCanShowFavourite] = useState(false)
   const price = formatPrice(product.price)
@@ -101,7 +102,12 @@ export function ProductItem({ product }: ProductProps) {
 
   async function onAddToCart() {
     productsAction.updateProductOnList({ ...product, isLoading: true })
-    const resultAction = await dispatch(addToCart({ ...product, amount: 1 }))
+    const resultAction = await dispatch(
+      addToCart({
+        product: { ...product, amount: 1 },
+        isUserLoggedIn
+      })
+    )
     dispatch(fetchCartProductsCount())
 
     if (addToCart.fulfilled.match(resultAction)) {

@@ -4,6 +4,7 @@ import { Cart as CartModel, CartProduct } from '@/models/cart'
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 const SliceName = 'cart'
+const LocalCart = -1
 
 export interface Cart {
   isLoading?: boolean
@@ -17,6 +18,15 @@ const initialState: Cart = {
   productsCount: 0,
   isLoading: true,
   isGoingToCheckout: false
+}
+
+function createLocalCart(): CartModel {
+  return {
+    id: LocalCart,
+    open: true,
+    products: [],
+    user_id: undefined
+  }
 }
 
 export const fetchCart = createAsyncThunk(
@@ -68,7 +78,40 @@ export const updateCart = createAsyncThunk(
 
 export const addToCart = createAsyncThunk(
   `${SliceName}/addToCart`,
-  async function (product: CartProduct, thunkApi): Promise<CartModel> {
+  async function (
+    {
+      product,
+      isUserLoggedIn
+    }: { product: CartProduct; isUserLoggedIn: boolean },
+    thunkApi
+  ): Promise<CartModel> {
+    if (!isUserLoggedIn) {
+      const cartItem = localStorage.getItem('cart')
+      let cart: CartModel =
+        cartItem === null ? createLocalCart() : JSON.parse(cartItem)
+
+      const productOnCartIndex = cart.products.findIndex(
+        (cartProduct) => cartProduct.id === product.id
+      )
+      let productOnCart: CartProduct | null = null
+
+      if (productOnCartIndex !== -1) {
+        productOnCart = cart.products[productOnCartIndex]
+        productOnCart.amount++
+        cart.products.splice(productOnCartIndex, 1, productOnCart)
+      } else {
+        productOnCart = {
+          ...product,
+          amount: 1
+        }
+        cart.products.push(productOnCart)
+      }
+
+      localStorage.setItem('cart', JSON.stringify(cart))
+
+      return cart
+    }
+
     const response = await clientFetch('/api/carts/products', {
       body: JSON.stringify(product),
       method: 'POST',
