@@ -108,7 +108,7 @@ export function ProductItem({ product }: ProductProps) {
         isUserLoggedIn
       })
     )
-    dispatch(fetchCartProductsCount())
+    dispatch(fetchCartProductsCount(isUserLoggedIn))
 
     if (addToCart.fulfilled.match(resultAction)) {
       toast('Produto adicionado ao carrinho :D', {

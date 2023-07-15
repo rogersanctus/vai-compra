@@ -11,18 +11,29 @@ import { formatPrice } from '@/lib/number'
 import { useRouter } from 'next/navigation'
 
 interface CartClientProps {
-  cart: Cart
+  cart: Cart | null
 }
 
 export function CartList({ cart }: CartClientProps) {
   const { cartAction } = actions
   const [total, setTotal] = useState('')
+  const isUserLoggedIn = useAppSelector((state) => state.auth.isLoggedIn)
   const localCart = useAppSelector((state) => state.cart.cart)
   const router = useRouter()
 
   useEffect(() => {
-    cartAction.setCart(cart)
-  }, [cart, cartAction])
+    if (isUserLoggedIn) {
+      cartAction.setCart(cart)
+    } else {
+      const cartItem = localStorage.getItem('cart')
+      console.info('cartItem', cartItem)
+
+      if (cartItem !== null) {
+        const storageCart = JSON.parse(cartItem)
+        cartAction.setCart(storageCart)
+      }
+    }
+  }, [cart, isUserLoggedIn, cartAction])
 
   useEffect(() => {
     if (!localCart) {

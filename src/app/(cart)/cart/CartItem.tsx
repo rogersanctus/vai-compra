@@ -1,7 +1,7 @@
 'use client'
 
 import { CartProduct } from '@/models/cart'
-import { useAppDispatch } from '@/stores'
+import { useAppDispatch, useAppSelector } from '@/stores'
 import { actions } from '@/stores/actions'
 import { updateCart } from '@/stores/cart'
 import { useEffect, useRef } from 'react'
@@ -14,6 +14,7 @@ interface CartItemProps {
 export function CartItem({ product }: CartItemProps) {
   const { cartAction } = actions
   const dispatch = useAppDispatch()
+  const isUserLoggedIn = useAppSelector((state) => state.auth.isLoggedIn)
   const updateCartAbortController = useRef<(() => void) | null>(null)
 
   useEffect(() => {
@@ -43,7 +44,9 @@ export function CartItem({ product }: CartItemProps) {
           updateCartAbortController.current = null
         }
 
-        const promise = dispatch(updateCart(newProduct))
+        const promise = dispatch(
+          updateCart({ isUserLoggedIn, product: newProduct })
+        )
         updateCartAbortController.current = promise.abort
         await promise
       } finally {
@@ -61,7 +64,7 @@ export function CartItem({ product }: CartItemProps) {
       updateCartAbortController.current = null
     }
 
-    const promise = dispatch(updateCart(payload))
+    const promise = dispatch(updateCart({ isUserLoggedIn, product: payload }))
     updateCartAbortController.current = promise.abort
   }
 
@@ -74,7 +77,7 @@ export function CartItem({ product }: CartItemProps) {
       updateCartAbortController.current = null
     }
 
-    const promise = dispatch(updateCart(payload))
+    const promise = dispatch(updateCart({ isUserLoggedIn, product: payload }))
     updateCartAbortController.current = promise.abort
 
     try {
