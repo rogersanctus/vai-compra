@@ -46,7 +46,26 @@ export const fetchCart = createAsyncThunk(
 
 export const fetchCartProductsCount = createAsyncThunk(
   `${SliceName}/fetchCartProductsCount`,
-  async function (_, thunkApi): Promise<{ count: number }> {
+  async function (
+    isUserLoggedIn: boolean,
+    thunkApi
+  ): Promise<{ count: number }> {
+    if (!isUserLoggedIn) {
+      const cartItem = localStorage.getItem('cart')
+
+      if (cartItem === null) {
+        return { count: 0 }
+      }
+
+      const cart: CartModel = JSON.parse(cartItem)
+
+      return {
+        count: cart.products.reduce((accum, curr) => {
+          return accum + curr.amount
+        }, 0)
+      }
+    }
+
     const response = await clientFetch('/api/carts/products/count', {
       signal: thunkApi.signal
     })
@@ -61,7 +80,39 @@ export const fetchCartProductsCount = createAsyncThunk(
 
 export const updateCart = createAsyncThunk(
   `${SliceName}/updateCart`,
-  async function (product: CartProduct, thunkApi): Promise<CartModel> {
+  async function (
+    {
+      product,
+      isUserLoggedIn
+    }: { product: CartProduct; isUserLoggedIn: boolean },
+    thunkApi
+  ): Promise<CartModel | undefined> {
+    if (!isUserLoggedIn) {
+      const cartItem = localStorage.getItem('cart')
+
+      if (cartItem !== null) {
+        const cart: CartModel = JSON.parse(cartItem)
+        const newAmount = product.amount
+        const localCartProductIdx = cart.products.findIndex(
+          (cartProduct) => cartProduct.id === product.id
+        )
+
+        if (localCartProductIdx !== -1) {
+          if (newAmount === 0) {
+            cart.products.splice(localCartProductIdx, 1)
+          } else {
+            cart.products[localCartProductIdx].amount = newAmount
+          }
+        }
+
+        localStorage.setItem('cart', JSON.stringify(cart))
+
+        return cart
+      }
+
+      return
+    }
+
     const response = await clientFetch('/api/carts/products', {
       body: JSON.stringify(product),
       method: 'PUT',
@@ -128,7 +179,33 @@ export const addToCart = createAsyncThunk(
 
 export const removeFromCart = createAsyncThunk(
   `${SliceName}/removeFromCart`,
-  async function (product: CartProduct, thunkApi): Promise<CartModel> {
+  async function (
+    {
+      product,
+      isUserLoggedIn
+    }: { product: CartProduct; isUserLoggedIn: boolean },
+    thunkApi
+  ): Promise<CartModel | undefined> {
+    if (!isUserLoggedIn) {
+      const cartItem = localStorage.getItem('cart')
+
+      if (cartItem) {
+        const cart: CartModel = JSON.parse(cartItem)
+        const cartProductIdx = cart.products.findIndex(
+          (cartProduct) => cartProduct.id === product.id
+        )
+
+        if (cartProductIdx !== -1) {
+          cart.products.splice(cartProductIdx, 1)
+          localStorage.setItem('cart', JSON.stringify(cart))
+
+          return cart
+        }
+      }
+
+      return
+    }
+
     const response = await clientFetch('/api/carts/products', {
       body: JSON.stringify(product),
       method: 'DELETE',
@@ -190,7 +267,7 @@ export const cart = createSlice({
         state.cart.products = copy
       }
     },
-    setCart(state, action: PayloadAction<CartModel>) {
+    setCart(state, action: PayloadAction<CartModel | null>) {
       state.cart = action.payload
     },
 
@@ -237,7 +314,9 @@ export const cart = createSlice({
       state.isLoading = true
     })
     builder.addCase(updateCart.fulfilled, (state, action) => {
-      state.cart = action.payload
+      if (action.payload !== undefined) {
+        state.cart = action.payload
+      }
       state.isLoading = false
     })
     builder.addCase(updateCart.rejected, (state) => {
@@ -259,7 +338,9 @@ export const cart = createSlice({
       state.isLoading = true
     })
     builder.addCase(removeFromCart.fulfilled, (state, action) => {
-      state.cart = action.payload
+      if (action.payload !== undefined) {
+        state.cart = action.payload
+      }
       state.isLoading = false
     })
     builder.addCase(removeFromCart.rejected, (state) => {
